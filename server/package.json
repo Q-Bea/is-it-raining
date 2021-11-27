@@ -1,0 +1,19 @@
+{
+  "name": "is-it-raining",
+  "version": "1.0.0",
+  "description": "Why do I do this",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Quantum158/is-it-raining.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Quantum158/is-it-raining/issues"
+  },
+  "homepage": "https://github.com/Quantum158/is-it-raining#readme"
+}
