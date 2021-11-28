@@ -11,6 +11,9 @@ export default class ExpressManager extends BaseManager {
     }
 
     start() {
+        this.express.get("/robots.txt", (req, res) => {
+            res.sendFile(process.cwd() + "/assets/robots.txt");
+        })
         this.express.get("", async (req, res) => {
             if (req.query.latLng && typeof(req.query.latLng) === "string") {
                 const latLongArray = req.query.latLng.split(",");
