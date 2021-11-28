@@ -6,11 +6,12 @@ export interface WeatherData {
     temperature: number
     isRaining: boolean
     isWindy: boolean
+    fromCache: boolean
 }
 
 interface CachedItemData {
     lastUpdate: number
-    data: WeatherData
+    data: Omit<WeatherData, "fromCache">
 }
 
 export default class WeatherManager extends BaseManager {
@@ -42,7 +43,15 @@ export default class WeatherManager extends BaseManager {
     }
 
     public async getWeatherData(lat: string, long: string): Promise<WeatherData> {
-        if (this.isCacheValid(lat, long)) return this.getFromCache(lat, long)!.data;
+        if (this.isCacheValid(lat, long)) {
+            const cache = this.getFromCache(lat, long)!.data
+            return {
+                fromCache: true,
+                isRaining: cache.isRaining,
+                isWindy: cache.isWindy,
+                temperature: cache.temperature
+            }
+        };
 
         try {
             const response = await axios({
@@ -72,7 +81,8 @@ export default class WeatherManager extends BaseManager {
                     return {
                         isRaining: isRaining,
                         isWindy: isWindy,
-                        temperature: temperature
+                        temperature: temperature,
+                        fromCache: false
                     }
                 }
             }
