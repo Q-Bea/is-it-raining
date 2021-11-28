@@ -37,6 +37,10 @@
                     "port": {
                         "type": "number",
                         "description": "Port number the server runs on"
+                    },
+                    "maxCachedItems": {
+                        "type": "number",
+                        "description": "Limit on how many items can be in the cache, if the limit is met, items that should be cached just aren't"
                     }
                 },
                 "required": [

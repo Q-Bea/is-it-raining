@@ -10,6 +10,7 @@ export interface ConfigData {
     port: number
     useWeatherCaching: boolean //If enabled, API requests are only made to pirate weather if it has been more than x minutes since the last request
     cacheMaxLifespanMinutes: number
+    maxCachedItems?: number
 }
 
 export default class Main {

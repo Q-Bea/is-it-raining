@@ -1,5 +1,6 @@
 {
     "cacheMaxLifespanMinutes": 15,
     "port": 7070,
-    "useWeatherCaching": true
+    "useWeatherCaching": true,
+    "maxCachedItems": 5
 }

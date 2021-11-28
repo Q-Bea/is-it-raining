@@ -68,14 +68,16 @@ export default class WeatherManager extends BaseManager {
 
                 if (!(isRaining === undefined || temperature === undefined || isWindy === undefined)) {
                     if (this.Main.config.useWeatherCaching) {
-                        this.cached.set(`${lat}${long}`, {
-                            data: {
-                                isRaining: isRaining,
-                                isWindy: isWindy,
-                                temperature: temperature
-                            },
-                            lastUpdate: Date.now()
-                        })
+                        if (this.Main.config.maxCachedItems && this.cached.size < this.Main.config.maxCachedItems) {
+                            this.cached.set(`${lat}${long}`, {
+                                data: {
+                                    isRaining: isRaining,
+                                    isWindy: isWindy,
+                                    temperature: temperature
+                                },
+                                lastUpdate: Date.now()
+                            })
+                        }
                     }
 
                     return {
