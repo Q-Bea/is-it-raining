@@ -1,0 +1,51 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": ["auth.json"],
+            "schema": {
+                "properties": {
+                    "pirateWeatherAPIKey": {
+                        "description": "API Key to access the Pirate Weather API",
+                        "type": "string"
+                    },
+                    "mapQuestAPIKey": {
+                        "description": "API Key for Map Quest",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "pirateWeatherAPIKey",
+                    "mapQuestAPIKey"
+                ],
+                "additionalProperties": false
+            }
+        },
+        {
+            "fileMatch": [
+                "config.json"
+            ],
+            "schema": {
+                "properties": {
+                    "useWeatherCaching": {
+                        "description": "If true, only call pirate weather if it has been more than x minutes since the lsat request",
+                        "type": "boolean"
+                    },
+                    "cacheMaxLifespanMinutes": {
+                        "description": "The number of minutes a cache can be reused before a call to pirate weather is made",
+                        "type": "number"
+                    },
+                    "port": {
+                        "type": "number",
+                        "description": "Port number the server runs on"
+                    }
+                },
+                "required": [
+                    "useWeatherCaching",
+                    "cacheMaxLifespanMinutes",
+                    "port"
+                ],
+                "additionalProperties": false
+            }
+        }
+    ]
+}
