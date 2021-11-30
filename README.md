@@ -15,18 +15,24 @@ The cold threshold is configurable by the end user
 ### Server API Requests
 The server only accepts GET Requests. The following endpoints are supported:
 
-`{hostname}/?latLng=<lat>,<long>`
+`{hostname}/<clientID>/location/<query>`
 
-`{hostname}/?location=<query>`
+`{hostname}/<clientID>/latlng/<lat>,<lng>`
 
-Failure to provide an endpoint satisfying these constraints will cause the server to respond with a `405`
+Failure to provide a known hostname will cause the server to respond with a 401
+Failure to provide an endpoint in the above format will cause the server to respond with a `400`
+Requesting an endpoint that does not exist will cause the server to respond with a `404`
 
 Valid API requests respond with the following payload:
 ```js
 {
-    temperature: number, //The degrees in celsius
+    temperature_c: number, //The degrees in celsius
     isRaining: boolean,
-    isWindy: boolean,
+    wind_kph: number, //
     fromCache: boolean //True if the data was returned from the internal cache rather than pirate weather
+    nextHour: { //Predictions for the weather at the hour mark closest to an hour from the request time
+        wind_kph: number,
+        isRaining: boolean
+    }
 }
 ```
