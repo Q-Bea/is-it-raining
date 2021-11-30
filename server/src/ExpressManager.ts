@@ -1,6 +1,7 @@
 import Main from ".";
 import BaseManager from "./BaseManager";
 import express from "express";
+import { InvalidWeatherDataReturnedError, NoWeatherDataReturnedError } from "./WeatherManager";
 
 export default class ExpressManager extends BaseManager {
     express
@@ -14,32 +15,76 @@ export default class ExpressManager extends BaseManager {
         this.express.get("/robots.txt", (req, res) => {
             res.sendFile(process.cwd() + "/assets/robots.txt");
         })
-        this.express.get("", async (req, res) => {
-            if (req.query.latLng && typeof(req.query.latLng) === "string") {
-                const latLongArray = req.query.latLng.split(",");
-                if (latLongArray.length === 2) {
-                    try {
-                        const weatherData = await this.Main.WeatherManager.getWeatherData(latLongArray[0], latLongArray[1]);
-                        res.send(weatherData);
-                    } catch(e) {
-                        res.send(500);
-                    }
-                }
-            } else {
-                if (req.query.location && typeof(req.query.location) === "string") {
-                    try {
-                        const latLng = await this.Main.WeatherManager.getLatLongFromLocationQuery(req.query.location);
-                        const weatherData = await this.Main.WeatherManager.getWeatherData(latLng[0], latLng[1])
-                        res.send(weatherData);
-                    } catch(e) {
-                        res.send(500);
-                    }
-                } else {
-                    res.sendStatus(405)
-                }
-            }
+
+        this.express.get("", (req, res) => {
+            res.sendStatus(200);
         })
+
+        this.express.get("/:clientID/location/:location", (req, res) => this.onLocation(req,res));
+        this.express.get("/:clientID/latlng/:lat,:lng", (req, res) => this.onLatLng(req,res));
+        this.express.get("/:clientID/latLng/:lat,:lng", (req, res) => this.onLatLng(req,res));
 
         this.express.listen(this.Main.config.port, () => console.log(`🚀 Server running on port ${this.Main.config.port}`));
     }
+
+    private validateClientToken(req: express.Request): boolean {
+        if (typeof(req.params.clientID) === "string") {
+            if (this.Main.auth.validClientIDs.includes(req.params.clientID)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private async onLocation(req: express.Request, res: express.Response) {
+        if (!this.validateClientToken(req)) {
+            res.sendStatus(401);
+            return;
+        }
+        if (typeof(req.params.location) === "string") {
+            try {
+                const latLng = await this.Main.WeatherManager.getLatLongFromLocationQuery(req.params.location);
+                const weatherData = await this.Main.WeatherManager.getWeatherData(latLng[0], latLng[1])
+                res.send(weatherData);
+            } catch(e) {
+                if (e instanceof NoWeatherDataReturnedError || e instanceof InvalidWeatherDataReturnedError) {
+                    res.sendStatus(500);
+                } else {
+                    res.sendStatus(400);
+                }
+            }
+
+            return;
+        }
+        res.sendStatus(400);
+    }
+    
+    private async onLatLng(req: express.Request, res: express.Response) {
+        if (!this.validateClientToken(req)) {
+            res.sendStatus(401);
+            return; 
+        }
+
+        if (typeof(req.params.lat) === "string" && typeof(req.params.lng) === "string") {
+            try {
+                if (isNaN(parseInt(req.params.lat)) || isNaN(parseInt(req.params.lng))) {
+                    throw Error();
+                }
+                const weatherData = await this.Main.WeatherManager.getWeatherData(req.params.lat, req.params.lng);
+                res.send(weatherData);
+            } catch(e) {
+                if (e instanceof NoWeatherDataReturnedError || e instanceof InvalidWeatherDataReturnedError) {
+                    res.sendStatus(500);
+                } else {
+                    res.sendStatus(400);
+                }
+            }
+
+            return;
+        }
+
+        res.sendStatus(400);
+    }
 }
+

@@ -4,6 +4,7 @@ import WeatherManager from "./WeatherManager";
 export interface AuthData {
     pirateWeatherAPIKey: string
     mapQuestAPIKey: string
+    validClientIDs: string[]
 }
 
 export interface ConfigData {
@@ -11,6 +12,7 @@ export interface ConfigData {
     useWeatherCaching: boolean //If enabled, API requests are only made to pirate weather if it has been more than x minutes since the last request
     cacheMaxLifespanMinutes: number
     maxCachedItems?: number
+    willRainThreshold: number
 }
 
 export default class Main {
@@ -48,8 +50,8 @@ const config = require("../config.json");
 
 //Check to ensure configs are valid
 if (
-    !checkValidConfig(auth, ["pirateWeatherAPIKey", "mapQuestAPIKey"]) || 
-    !checkValidConfig(config, ["cacheMaxLifespanMinutes", "port", "useWeatherCaching"])
+    !checkValidConfig(auth, ["pirateWeatherAPIKey", "mapQuestAPIKey", "validClientIDs"]) || 
+    !checkValidConfig(config, ["cacheMaxLifespanMinutes", "port", "useWeatherCaching", "willRainThreshold"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...")
     process.exit(1);

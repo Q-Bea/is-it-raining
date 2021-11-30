@@ -1,18 +1,27 @@
 import Main from ".";
 import BaseManager from "./BaseManager";
 import axios from "axios";
+import CustomError from "./CustomError";
 
 export interface WeatherData {
-    temperature: number
+    temperature_c: number
     isRaining: boolean
-    isWindy: boolean
+    wind_kph: number
     fromCache: boolean
+    nextHour: Omit<Omit<Omit<WeatherData, "temperature_c">, "fromCache">, "nextHour">
 }
+
+export class NoWeatherDataReturnedError extends CustomError {}
+export class InvalidWeatherDataReturnedError extends CustomError {}
+export class LatLngNotFoundError extends CustomError {}
+
 
 interface CachedItemData {
     lastUpdate: number
     data: Omit<WeatherData, "fromCache">
 }
+
+const WIND_MPH_TO_KPH = 1.609344;
 
 export default class WeatherManager extends BaseManager {
     cached: Map<string, CachedItemData> = new Map();
@@ -48,8 +57,9 @@ export default class WeatherManager extends BaseManager {
             return {
                 fromCache: true,
                 isRaining: cache.isRaining,
-                isWindy: cache.isWindy,
-                temperature: cache.temperature
+                wind_kph: cache.wind_kph,
+                temperature_c: cache.temperature_c,
+                nextHour: cache.nextHour
             }
         };
 
@@ -62,37 +72,56 @@ export default class WeatherManager extends BaseManager {
             })
 
             if (response.status === 200) {
-                const isRaining = response.data.currently?.precipType === "rain" || response.data.currently?.precipProbability > 0.70
-                const temperature = (response.data.currently?.temperature - 32) * (5/9);
-                const isWindy = response.data.currently?.windSpeed * 1.609344 > 15;
+                if (response.data.currently && response.data.hourly?.data) {
+                    //data[0] is the current hour, data[1] is the next hour
+                    const hourFromNow = response.data.currently.time + 3600;
 
-                if (!(isRaining === undefined || temperature === undefined || isWindy === undefined)) {
+                    //Want to find the forecast the closest to an hour from now, which will either be data[1] or data[2]
+                    const data1Check = Math.abs(hourFromNow - response.data.hourly.data[1].time);
+                    const data2Check = Math.abs(hourFromNow - response.data.hourly.data[2].time);
+                    
+                    const nextHourData = data1Check < data2Check ? response.data.hourly.data[1] : response.data.hourly.data[2];
+
+
+                    const isRainingNow = response.data.currently?.precipType === "rain" || response.data.currently?.precipProbability > this.Main.config.willRainThreshold;
+                    const mightRainLater = nextHourData.precipType === "rain" || nextHourData.precipProbability > this.Main.config.willRainThreshold;
+                    const temperature_c = (response.data.currently.temperature - 32) * (5/9);
+                    const windNow = response.data.currently.windSpeed * WIND_MPH_TO_KPH;
+                    const windLater = nextHourData.windSpeed * WIND_MPH_TO_KPH;
+
                     if (this.Main.config.useWeatherCaching) {
                         if (this.Main.config.maxCachedItems && this.cached.size < this.Main.config.maxCachedItems) {
                             this.cached.set(`${lat}${long}`, {
                                 data: {
-                                    isRaining: isRaining,
-                                    isWindy: isWindy,
-                                    temperature: temperature
+                                    isRaining: isRainingNow,
+                                    wind_kph: windNow,
+                                    temperature_c: temperature_c,
+                                    nextHour: {
+                                        isRaining: mightRainLater,
+                                        wind_kph: windLater
+                                    }
                                 },
                                 lastUpdate: Date.now()
                             })
                         }
                     }
-
                     return {
-                        isRaining: isRaining,
-                        isWindy: isWindy,
-                        temperature: temperature,
-                        fromCache: false
+                        isRaining: isRainingNow,
+                        wind_kph: windNow,
+                        temperature_c: temperature_c,
+                        fromCache: false,
+                        nextHour: {
+                            isRaining: mightRainLater,
+                            wind_kph: windLater
+                        }
                     }
                 }
             }
 
-            throw Error();
+            throw new InvalidWeatherDataReturnedError();
         } catch(e) {
             console.error(e);
-            throw Error();
+            throw new NoWeatherDataReturnedError();
         }
     }
 
@@ -123,10 +152,10 @@ export default class WeatherManager extends BaseManager {
                     return [latLng.lat, latLng.lng];
                 }
             }
-            throw Error("Could not find Lat Long");
+            throw new LatLngNotFoundError()
         } catch(e) {
             console.error(e);
-            throw Error();
+            throw new LatLngNotFoundError();
         }
     } 
 }

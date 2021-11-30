@@ -11,11 +11,16 @@
                     "mapQuestAPIKey": {
                         "description": "API Key for Map Quest",
                         "type": "string"
+                    },
+                    "validClientIDs": {
+                        "description": "An array of tokens that can be used to trigger api flows",
+                        "type": ["array"]
                     }
                 },
                 "required": [
                     "pirateWeatherAPIKey",
-                    "mapQuestAPIKey"
+                    "mapQuestAPIKey",
+                    "validClientIDs"
                 ],
                 "additionalProperties": false
             }
@@ -32,24 +37,38 @@
                     },
                     "cacheMaxLifespanMinutes": {
                         "description": "The number of minutes a cache can be reused before a call to pirate weather is made",
-                        "type": "number"
+                        "type": "number",
+                        "minimum": 15
                     },
                     "port": {
                         "type": "number",
-                        "description": "Port number the server runs on"
+                        "description": "Port number the server runs on",
+                        "minimum": 0,
+                        "maximum": 65535
                     },
                     "maxCachedItems": {
                         "type": "number",
-                        "description": "Limit on how many items can be in the cache, if the limit is met, items that should be cached just aren't"
+                        "description": "Limit on how many items can be in the cache, if the limit is met, items that should be cached just aren't",
+                        "minimum": 0
+                    },
+                    "willRainThreshold": {
+                        "type": "number",
+                        "description": "Minimum probability that it will rain to say that it will rain",
+                        "maximum": 1,
+                        "minimum": 0
                     }
                 },
                 "required": [
                     "useWeatherCaching",
                     "cacheMaxLifespanMinutes",
-                    "port"
+                    "port",
+                    "willRainThreshold"
                 ],
                 "additionalProperties": false
             }
         }
+    ],
+    "cSpell.words": [
+        "latlng"
     ]
 }
