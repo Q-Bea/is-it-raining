@@ -83,7 +83,11 @@ export default class WeatherManager extends BaseManager {
                     const nextHourData = data1Check < data2Check ? response.data.hourly.data[1] : response.data.hourly.data[2];
 
 
-                    const isRainingNow = response.data.currently.summary === "Rain" || response.data.currently?.precipProbability > this.Main.config.willRainThreshold;
+                    const isRainingNow = (
+                        response.data.currently.summary === "Rain" || 
+                        response.data.currently?.precipProbability > this.Main.config.willRainThreshold || 
+                        response.data.hourly.data[0].summary === "Rain" ||
+                        response.data.hourly.data[0].precipProbability > this.Main.config.willRainThreshold);
                     const mightRainLater = nextHourData.summary === "Rain" || nextHourData.precipProbability > this.Main.config.willRainThreshold;
                     const temperature_c = (response.data.currently.temperature - 32) * (5/9);
                     const windNow = response.data.currently.windSpeed * WIND_MPH_TO_KPH;
