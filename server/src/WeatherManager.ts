@@ -2,13 +2,13 @@ import Main from ".";
 import BaseManager from "./BaseManager";
 import axios from "axios";
 import CustomError from "./CustomError";
-
 export interface WeatherData {
-    temperature_c: number
+    temperature_c_feel: number
+    temperature_c_real: number
     isRaining: boolean
     wind_kph: number
     fromCache: boolean
-    nextHour: Omit<Omit<Omit<WeatherData, "temperature_c">, "fromCache">, "nextHour">
+    nextHour: Omit<Omit<Omit<Omit<WeatherData, "temperature_c_feel">, "fromCache">, "nextHour">, "temperature_c_real">
 }
 
 export class NoWeatherDataReturnedError extends CustomError {}
@@ -21,7 +21,7 @@ interface CachedItemData {
     data: Omit<WeatherData, "fromCache">
 }
 
-const WIND_MPH_TO_KPH = 1.609344;
+const WIND_MS_TO_KPH = 3.2;
 
 export default class WeatherManager extends BaseManager {
     cached: Map<string, CachedItemData> = new Map();
@@ -58,40 +58,43 @@ export default class WeatherManager extends BaseManager {
                 fromCache: true,
                 isRaining: cache.isRaining,
                 wind_kph: cache.wind_kph,
-                temperature_c: cache.temperature_c,
+                temperature_c_feel: cache.temperature_c_feel,
+                temperature_c_real: cache.temperature_c_real,
                 nextHour: cache.nextHour
             }
         };
 
         try {
             const response = await axios({
-                url: `https://api.pirateweather.net/forecast/${this.Main.auth.pirateWeatherAPIKey}/${lat},${long}`,
+                url: `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${long}&exclude=minutely&units=metric&appid=${this.Main.auth.openWeatherAPIKey}`,
                 responseType: "json",
                 method: "GET",
                 timeout: 5000
             })
 
             if (response.status === 200) {
-                if (response.data.currently && response.data.hourly?.data) {
-                    //data[0] is the current hour, data[1] is the next hour
-                    const hourFromNow = response.data.currently.time + 3600;
-
+                if (response.data.current) {
                     //Want to find the forecast the closest to an hour from now, which will either be data[1] or data[2]
-                    const data1Check = Math.abs(hourFromNow - response.data.hourly.data[1].time);
-                    const data2Check = Math.abs(hourFromNow - response.data.hourly.data[2].time);
+                    //data[0] is the current hour, data[1] is the next hour
+                    const hourFromNow = (response.data.current.dt + 60);
+
+                    const data1Check = Math.abs(hourFromNow - response.data.hourly[1].dt);
+                    const data2Check = Math.abs(hourFromNow - response.data.hourly[2].dt);
                     
-                    const nextHourData = data1Check < data2Check ? response.data.hourly.data[1] : response.data.hourly.data[2];
+                    const nextHourData = data1Check < data2Check ? response.data.hourly[1] : response.data.hourly[2];
 
+                    const isRainingNow = (response.data.current.weather as [any]).some(weatherObject => {
+                        return ["Rain", "Drizzle", "Thunderstorm"].includes(weatherObject.Main);
+                    });
 
-                    const isRainingNow = (
-                        response.data.currently.summary === "Rain" || 
-                        response.data.currently?.precipProbability > this.Main.config.willRainThreshold || 
-                        response.data.hourly.data[0].summary === "Rain" ||
-                        response.data.hourly.data[0].precipProbability > this.Main.config.willRainThreshold);
-                    const mightRainLater = nextHourData.summary === "Rain" || nextHourData.precipProbability > this.Main.config.willRainThreshold;
-                    const temperature_c = (response.data.currently.temperature - 32) * (5/9);
-                    const windNow = response.data.currently.windSpeed * WIND_MPH_TO_KPH;
-                    const windLater = nextHourData.windSpeed * WIND_MPH_TO_KPH;
+                    const mightRainLater = (nextHourData.weather as [any]).some(weatherObject => {
+                        return ["Rain", "Drizzle", "Thunderstorm"].includes(weatherObject.Main);
+                    })
+
+                    const temperature_c_feel = response.data.current.feels_like;
+                    const temperature_c_real = response.data.current.temp
+                    const windNow = response.data.current.wind_speed * WIND_MS_TO_KPH;
+                    const windLater = nextHourData.wind_speed * WIND_MS_TO_KPH;
 
                     if (this.Main.config.useWeatherCaching) {
                         if (this.Main.config.maxCachedItems && this.cached.size < this.Main.config.maxCachedItems) {
@@ -99,10 +102,11 @@ export default class WeatherManager extends BaseManager {
                                 data: {
                                     isRaining: isRainingNow,
                                     wind_kph: windNow,
-                                    temperature_c: temperature_c,
+                                    temperature_c_feel: temperature_c_feel,
+                                    temperature_c_real: temperature_c_real,
                                     nextHour: {
                                         isRaining: mightRainLater,
-                                        wind_kph: windLater
+                                        wind_kph: windLater,
                                     }
                                 },
                                 lastUpdate: Date.now()
@@ -112,7 +116,8 @@ export default class WeatherManager extends BaseManager {
                     return {
                         isRaining: isRainingNow,
                         wind_kph: windNow,
-                        temperature_c: temperature_c,
+                        temperature_c_feel: temperature_c_feel,
+                        temperature_c_real: temperature_c_real,
                         fromCache: false,
                         nextHour: {
                             isRaining: mightRainLater,

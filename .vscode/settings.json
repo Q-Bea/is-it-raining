@@ -1,11 +1,11 @@
 {
     "json.schemas": [
         {
-            "fileMatch": ["auth.json"],
+            "fileMatch": ["server/**/auth.json"],
             "schema": {
                 "properties": {
-                    "pirateWeatherAPIKey": {
-                        "description": "API Key to access the Pirate Weather API",
+                    "openWeatherAPIKey": {
+                        "description": "API Key to access the Open Weather API",
                         "type": "string"
                     },
                     "mapQuestAPIKey": {
@@ -18,7 +18,7 @@
                     }
                 },
                 "required": [
-                    "pirateWeatherAPIKey",
+                    "openWeatherAPIKey",
                     "mapQuestAPIKey",
                     "validClientIDs"
                 ],
@@ -27,7 +27,7 @@
         },
         {
             "fileMatch": [
-                "config.json"
+                "server/**/config.json"
             ],
             "schema": {
                 "properties": {
@@ -50,25 +50,105 @@
                         "type": "number",
                         "description": "Limit on how many items can be in the cache, if the limit is met, items that should be cached just aren't",
                         "minimum": 0
-                    },
-                    "willRainThreshold": {
-                        "type": "number",
-                        "description": "Minimum probability that it will rain to say that it will rain",
-                        "maximum": 1,
-                        "minimum": 0
                     }
                 },
                 "required": [
                     "useWeatherCaching",
                     "cacheMaxLifespanMinutes",
-                    "port",
-                    "willRainThreshold"
+                    "port"
+                ],
+                "additionalProperties": false
+            }
+        },
+
+
+        {
+            "fileMatch": ["client/**/auth.json"],
+            "schema": {
+                "properties": {
+                    "motherAuthToken": {
+                        "description": "API Token to contact Mother",
+                        "type": "string"
+                    },
+                    "isItRainingAuthToken": {
+                        "description": "API Token to access Is It Raining",
+                        "type": "string"
+                    },
+                    "speechServicesAuthToken": {
+                        "description": "API Token to access Microsoft Speech Services",
+                        "type": "string"
+                    },
+                    "speechServicesAuthRegion": {
+                        "description": "Region the Microsoft Speech Service runs in",
+                        "type": "string"
+                    }
+                },
+                "required": [
+                    "motherAuthToken",
+                    "isItRainingAuthToken",
+                    "speechServicesAuthToken",
+                    "speechServicesAuthRegion"
+                ],
+                "additionalProperties": false
+            }
+        },
+        {
+            "fileMatch": [
+                "client/**/config.json"
+            ],
+            "schema": {
+                "properties": {
+                    "offlineBehaviour": {
+                        "description": "Behaviour if the client is unable to contact the IIT API (repeatLast or block).",
+                        "type": "string"
+                        
+                    },
+                    "motherDownloadedConfigFilename": {
+                        "description": "The name of the file containing stored properties from Mother",
+                        "type": "string"
+                    },
+                    "fallbackSettings": {
+                        "type": "object",
+                        "description": "Fallback settings if Mother is unavilable",
+                        "required": ["savePreviousAudioFiles", "volume", "location"],
+                        "properties": {
+                            "savePreviousAudioFiles": {
+                                "description": "Whether or not to save created audio files for reuse. If set to `false` after being true, existing audio files will be deleted",
+                                "type": "boolean"
+                            },
+                            "volume": {
+                                "description": "Volume of played audio files (0-10)",
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 10
+                            },
+                            "location": {
+                                "type": "object",
+                                "properties": {
+                                    "type": {
+                                        "type": "string",
+                                        "description": "Either `city` or `latlng`"
+                                    },
+                                    "value": {
+                                        "type": "string",
+                                        "description": "Either the name of a searching city location string or lat,lng position"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "offlineBehaviour",
+                    "motherDownloadedConfigFilename",
+                    "fallbackSettings"
                 ],
                 "additionalProperties": false
             }
         }
     ],
     "cSpell.words": [
+        "Behaviour",
         "latlng"
     ]
 }

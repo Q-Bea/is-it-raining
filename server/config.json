@@ -2,6 +2,5 @@
     "cacheMaxLifespanMinutes": 15,
     "port": 7070,
     "useWeatherCaching": true,
-    "maxCachedItems": 5,
-    "willRainThreshold": 0.3
+    "maxCachedItems": 5
 }
