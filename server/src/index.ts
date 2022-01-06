@@ -70,7 +70,7 @@ export default class Main {
         this.txTotalRequests = tx2.metric("Total Requests")
         this.txTotalRequests?.set(this.getTotalRequests())
 
-        this.txLastRequest = tx2.metrix("Last Request");
+        this.txLastRequest = tx2.metric("Last Request");
         this.txLastRequest?.set("Unknown / Before Startup")
 
         return this;
