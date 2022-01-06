@@ -25,7 +25,7 @@ export default class ExpressManager extends BaseManager {
         }
 
         const totalRequests = this.getTotalRequests()
-        console.log(`Request Received! --> Client ID: ${clientID} | Total requests by this client: ${total} | Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}%)`)
+        console.log(`Request Received! -->\n    Client ID: ${clientID}\n    Total requests by this client: ${total}\n   Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}\n------\n`)
     }
 
     private getTotalRequests() {
