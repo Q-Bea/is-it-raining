@@ -145,7 +145,7 @@ export default class WeatherManager extends BaseManager {
     public async getLatLongFromLocationQuery(query: string): Promise<[lat: string, long: string]> {
         try {
             const response = await axios({
-                url: `http://www.mapquestapi.com/geocoding/v1/address`,
+                url: `https://www.mapquestapi.com/geocoding/v1/address`,
                 params: {
                     key: this.Main.auth.mapQuestAPIKey,
                     location: query
