@@ -17,8 +17,11 @@ export default class ExpressManager extends BaseManager {
         if (existingData !== undefined && existingData.requestsMade !== undefined) {
             this.Main.DbManager.set(clientID, {requestsMade: existingData.requestsMade + 1, lastRequestDate: new Date(Date.now()).toString()}, true)
         } else {
-            this.Main.DbManager.set(clientID, {requestsMade: 1, lastRequestDate: new Date(Date.now())})
+            this.Main.DbManager.set(clientID, {requestsMade: 1, lastRequestDate: new Date(Date.now()).toString()})
         }
+
+        this.Main.incrementTotalRequests();
+        this.Main.setLastRequestDate(new Date(Date.now()).toString());
     }
 
     start() {

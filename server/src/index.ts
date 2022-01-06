@@ -25,6 +25,7 @@ export default class Main {
     DbManager: DbManager
 
     txTotalRequests?: any
+    txLastRequest?: any
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
@@ -66,14 +67,21 @@ export default class Main {
             }
         })
 
-        this.txTotalRequests = tx2.counter("totalRequests")
+        this.txTotalRequests = tx2.metric("Total Requests")
         this.txTotalRequests?.set(this.getTotalRequests())
+
+        this.txLastRequest = tx2.metrix("Last Request");
+        this.txLastRequest?.set("Unknown / Before Startup")
 
         return this;
     }
 
     incrementTotalRequests() {
-        this.txTotalRequests?.inc()
+        this.txTotalRequests?.set(this.txTotalRequests?.get() + 1);
+    }
+
+    setLastRequestDate(date: string) {
+        this.txLastRequest?.set(date)
     }
 
     private getTotalRequests() {
