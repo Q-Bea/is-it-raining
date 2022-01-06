@@ -25,7 +25,7 @@ export default class DbManager extends BaseManager {
         }
 
         if (!fs.existsSync(this.getFilePath())) {
-            // console.error(`DB file must exist! (db/${dbFileName})`);
+            console.warn(`DB file must exist! (db/${dbFileName}) --> Creating it now...`);
             fs.writeFileSync(process.cwd() + `/db/${dbFileName}`, '{}')
         }
     }
