@@ -24,9 +24,6 @@ export default class Main {
     ExpressManager: ExpressManager
     DbManager: DbManager
 
-    txTotalRequests?: any
-    txLastRequest?: any
-
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
         this.config = config;
@@ -67,36 +64,7 @@ export default class Main {
             }
         })
 
-        this.txTotalRequests = tx2.metric("Total Requests")
-        this.txTotalRequests?.set(this.getTotalRequests())
-
-        this.txLastRequest = tx2.metric("Last Request");
-        this.txLastRequest?.set("Unknown / Before Startup")
-
         return this;
-    }
-
-    incrementTotalRequests() {
-        this.txTotalRequests?.set(this.txTotalRequests?.get() + 1);
-    }
-
-    setLastRequestDate(date: string) {
-        this.txLastRequest?.set(date)
-    }
-
-    private getTotalRequests() {
-        const dbDump = this.DbManager.getAll();
-
-        if (dbDump !== undefined) {
-            let output = 0
-            for (const clientID in dbDump) {
-                output += dbDump[clientID].requestsMade ?? 0
-            }
-
-            return output;
-        } else {
-            return 0;
-        }
     }
 }
 

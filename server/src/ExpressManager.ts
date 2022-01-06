@@ -14,14 +14,33 @@ export default class ExpressManager extends BaseManager {
     logRequest(clientID: string) {
         const existingData = this.Main.DbManager.get(clientID);
 
+        let total = 0
+
         if (existingData !== undefined && existingData.requestsMade !== undefined) {
+            total = existingData.requestsMade + 1;
             this.Main.DbManager.set(clientID, {requestsMade: existingData.requestsMade + 1, lastRequestDate: new Date(Date.now()).toString()}, true)
         } else {
+            total = 1;
             this.Main.DbManager.set(clientID, {requestsMade: 1, lastRequestDate: new Date(Date.now()).toString()})
         }
 
-        this.Main.incrementTotalRequests();
-        this.Main.setLastRequestDate(new Date(Date.now()).toString());
+        const totalRequests = this.getTotalRequests()
+        console.log(`Request Received! --> Client ID: ${clientID} | Total requests by this client: ${total} | Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}%)`)
+    }
+
+    private getTotalRequests() {
+        const dbDump = this.Main.DbManager.getAll();
+
+        if (dbDump !== undefined) {
+            let output = 0
+            for (const clientID in dbDump) {
+                output += dbDump[clientID].requestsMade ?? 0
+            }
+
+            return output;
+        } else {
+            return 0;
+        }
     }
 
     start() {
