@@ -1,0 +1,14 @@
+{
+    "motherDownloadedConfigFilename": "motherConfig",
+    "motherCheckInInterval_ms": 30000,
+    "motherDownloadAlsoChecksIn": true,
+    "offlineBehaviour": "block",
+    "fallbackSettings": {
+        "location": {
+            "type": "latlng",
+            "value": [49.258500,-123.250640]
+        },
+        "savePreviousAudioFiles": true,
+        "volume": 8
+    }
+}

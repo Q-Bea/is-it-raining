@@ -130,18 +130,29 @@
                                         "description": "Either `city` or `latlng`"
                                     },
                                     "value": {
-                                        "type": "string",
-                                        "description": "Either the name of a searching city location string or lat,lng position"
+                                        "type": ["string", "array"],
+                                        "description": "Either the name of a searching city location string or lat,lng position (`city string` or [lat, long])"
                                     }
                                 }
                             }
                         }
+                    },
+                    "motherCheckInInterval_ms": {
+                        "description": "How long should the client wait between checkins and downloads from Mother (milliseconds)",
+                        "type": "number",
+                        "minimum": 15000,
+                    },
+                    "motherDownloadAlsoChecksIn": {
+                        "description": "If on the Mother server, downloading the config also counts as checking in",
+                        "type": "boolean"
                     }
                 },
                 "required": [
                     "offlineBehaviour",
                     "motherDownloadedConfigFilename",
-                    "fallbackSettings"
+                    "fallbackSettings",
+                    "motherCheckInInterval_ms",
+                    "motherDownloadAlsoChecksIn"
                 ],
                 "additionalProperties": false
             }
