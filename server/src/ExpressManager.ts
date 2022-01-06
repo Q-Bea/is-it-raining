@@ -11,6 +11,16 @@ export default class ExpressManager extends BaseManager {
         this.express = express();
     }
 
+    logRequest(clientID: string) {
+        const existingData = this.Main.DbManager.get(clientID);
+
+        if (existingData !== undefined && existingData.requestsMade !== undefined) {
+            this.Main.DbManager.set(clientID, {requestsMade: existingData.requestsMade + 1, lastRequestDate: new Date(Date.now()).toString()}, true)
+        } else {
+            this.Main.DbManager.set(clientID, {requestsMade: 1, lastRequestDate: new Date(Date.now())})
+        }
+    }
+
     start() {
         this.express.get("/robots.txt", (req, res) => {
             res.sendFile(process.cwd() + "/assets/robots.txt");
@@ -40,8 +50,12 @@ export default class ExpressManager extends BaseManager {
     private async onLocation(req: express.Request, res: express.Response) {
         if (!this.validateClientToken(req)) {
             res.sendStatus(401);
+            this.logRequest("Unauthorized");
             return;
         }
+
+        this.logRequest(req.params.clientID);
+
         if (typeof(req.params.location) === "string") {
             try {
                 const latLng = await this.Main.WeatherManager.getLatLongFromLocationQuery(req.params.location);
@@ -63,8 +77,11 @@ export default class ExpressManager extends BaseManager {
     private async onLatLng(req: express.Request, res: express.Response) {
         if (!this.validateClientToken(req)) {
             res.sendStatus(401);
+            this.logRequest("Unauthorized");
             return; 
         }
+
+        this.logRequest(req.params.clientID);
 
         if (typeof(req.params.lat) === "string" && typeof(req.params.lng) === "string") {
             try {

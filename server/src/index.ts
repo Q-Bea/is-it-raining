@@ -1,5 +1,7 @@
 import ExpressManager from "./ExpressManager";
 import WeatherManager from "./WeatherManager";
+import DbManager from "./DbManager";
+const tx2 = require("tx2")
 
 export interface AuthData {
     openWeatherAPIKey: string
@@ -20,12 +22,17 @@ export default class Main {
 
     WeatherManager: WeatherManager
     ExpressManager: ExpressManager
+    DbManager: DbManager
+
+    txTotalRequests?: any
+
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
         this.config = config;
 
         this.WeatherManager = new WeatherManager(this);
         this.ExpressManager = new ExpressManager(this);
+        this.DbManager = new DbManager(this, "logging.json");
     }
 
     startIntervalCacheClearer(): this {
@@ -42,6 +49,47 @@ export default class Main {
         this.ExpressManager.start();
         return this;
     }
+
+    startTX2(): this {
+        tx2.action("queryUsageByClientID", (cb: any) => {
+            const dbDump = this.DbManager.getAll();
+
+            if (dbDump !== undefined) {
+                const output: Record<string, string> = {}
+                for (const clientID in dbDump) {
+                    output[clientID] = `Requests: ${dbDump[clientID].requestsMade ?? 0} | Last Request: ${dbDump[clientID].lastRequestDate ?? "Never"}`
+                }
+
+                cb(output)
+            } else {
+                cb({})
+            }
+        })
+
+        this.txTotalRequests = tx2.counter("totalRequests")
+        this.txTotalRequests?.set(this.getTotalRequests())
+
+        return this;
+    }
+
+    incrementTotalRequests() {
+        this.txTotalRequests?.inc()
+    }
+
+    private getTotalRequests() {
+        const dbDump = this.DbManager.getAll();
+
+        if (dbDump !== undefined) {
+            let output = 0
+            for (const clientID in dbDump) {
+                output += dbDump[clientID].requestsMade ?? 0
+            }
+
+            return output;
+        } else {
+            return 0;
+        }
+    }
 }
 
 const auth = require("../auth.json");
@@ -56,7 +104,7 @@ if (
     process.exit(1);
 }
 
-new Main(auth, config).startIntervalCacheClearer().startExpressServer();
+new Main(auth, config).startTX2().startIntervalCacheClearer().startExpressServer();
 
 function checkValidConfig(data: Record<string, unknown>, requiredKeys: string[]): boolean {
     for (const key of requiredKeys) {
