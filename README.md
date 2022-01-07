@@ -2,7 +2,7 @@ Made as a christmas gift for Claire.
 
 This file contains the source files for two projects:
 ### 1: An express webserver
-GET requests to the server respond with answers to the only three questions that need to be answered ever
+GET requests to the server respond with answers to the only three questions that need to be answered
 - Is it cold? 
 - Is it raining?
 - Is it windy?
