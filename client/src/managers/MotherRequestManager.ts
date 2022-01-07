@@ -1,6 +1,30 @@
 import Main, { BaseManager } from "..";
 import axios from "axios";
+import { DialogueObject } from "./speechSubRoutine/SpeechDialogueManager";
 
+export interface locationObject_latlng {
+    type: "latlng",
+    value: [lat: number, long: number]
+}
+
+export interface locationObject_locationQuery {
+    type: "location",
+    value: "string"
+}
+
+export interface MotherSettings {
+    dialogueSpeed: number
+    savePreviousAudioFiles: boolean
+    location: locationObject_latlng|locationObject_locationQuery
+    coldFeelThreshold_c: number
+    windThreshold_kph: number
+    sayFuturePrediction: boolean
+}
+
+export interface MotherConfigData {
+    dialogues: DialogueObject[]
+    settings: MotherSettings
+}
 export default class MotherRequestManager extends BaseManager {
     checkInDownloadInterval?: NodeJS.Timer
     constructor(Main: Main) {
@@ -14,11 +38,13 @@ export default class MotherRequestManager extends BaseManager {
         }
         this.checkInDownloadInterval = setInterval(async () => {
             const fileData = await this.checkInDownload(true);
-            console.log(fileData);
+            if (fileData) {
+                this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
+            }
         }, this.Main.config.motherCheckInInterval_ms)
     }
 
-    async checkInDownload(intervalBased = false) {
+    async checkInDownload(intervalBased = false): Promise<MotherConfigData|undefined> {
         let wasError = false;
         let data = undefined;
         try {

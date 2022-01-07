@@ -5,24 +5,12 @@ export class BaseManager {
     }
 }
 
-import MotherRequestManager from "./managers/MotherRequestManager"
-import SettingsManager from "./managers/SettingsManager"
+import MotherRequestManager, { type MotherSettings } from "./managers/MotherRequestManager"
+import StorageManager from "./managers/StorageManager"
 import SpeechRequestHandler from "./managers/SpeechRequestHandler"
-
-export interface locationObject_latlng {
-    type: "latlng",
-    value: [number, number]
-}
-
-export interface locationObject_locationQuery {
-    type: "location",
-    value: "string"
-}
-
-export interface MotherSettings {
-    location: locationObject_latlng | locationObject_locationQuery,
-    savePreviousAudioFiles: boolean
-}
+import IITRequestManager from "./managers/IITRequestManager"
+import GPIOInterface from "./managers/GPIOInterface"
+import SettingsManager from "./managers/SettingsManager"
 
 export interface ConfigData {
     motherDownloadedConfigFilename: string
@@ -43,17 +31,23 @@ export default class Main {
     auth: AuthData
     config: ConfigData
 
-    SettingManager: SettingsManager
+    StorageManager: StorageManager
     SpeechRequestHandler: SpeechRequestHandler
     MotherRequestManager: MotherRequestManager
+    IITRequestManager: IITRequestManager
+    GPIOInterface: GPIOInterface
+    SettingsManager: SettingsManager
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
         this.config = config;
 
         this.MotherRequestManager = new MotherRequestManager(this);
-        this.SettingManager = new SettingsManager(this);
+        this.StorageManager = new StorageManager(this);
         this.SpeechRequestHandler = new SpeechRequestHandler(this);
+        this.IITRequestManager = new IITRequestManager(this);
+        this.GPIOInterface = new GPIOInterface(this);
+        this.SettingsManager = new SettingsManager(this);
     }
 
     start() {
@@ -69,7 +63,7 @@ const configData = require("../config.json")
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
-    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "offlineBehaviour", "fallbackSettings", "motherCheckInInterval_ms", "motherDownloadAlsoChecksIn"])
+    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "motherCheckInInterval_ms", "motherDownloadAlsoChecksIn"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...")
     process.exit(1);

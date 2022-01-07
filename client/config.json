@@ -2,13 +2,42 @@
     "motherDownloadedConfigFilename": "motherConfig",
     "motherCheckInInterval_ms": 30000,
     "motherDownloadAlsoChecksIn": true,
-    "offlineBehaviour": "block",
     "fallbackSettings": {
         "location": {
             "type": "latlng",
             "value": [49.258500,-123.250640]
         },
-        "savePreviousAudioFiles": true,
-        "volume": 8
+        "coldFeelThreshold_c": 5,
+        "windThreshold_kph": 35,
+        "sayFuturePrediction": true,
+        "dialogue": [
+            {
+                "fileName": "rainingNow.wav",
+                "properties": ["Raining"],
+                "text": "It is currently raining. Are you surprised?"
+            },
+            {
+                "fileName": "rainingWindyNow.wav",
+                "properties": ["Raining", "Windy"],
+                "text": "Right now it is raining and windy. You should consider if the umbrella is really worth it."
+            },
+            {
+                "fileName": "rainingWindyColdNow.wav",
+                "properties": ["Raining", "Windy", "Cold"],
+                "text": "Today you are in for a treat, it is raining, windy and cold. Have fun!"
+            },
+            {
+                "fileName": "futureRaining.wav",
+                "properties": ["Future", "Raining"],
+                "text": "In an hour it will be probably be raining, but not windy."
+            },
+            {
+                "fileName": "futureRainingWindy.wav",
+                "properties": ["Future", "Raining", "Windy"],
+                "text": "In an hour it will be probably be raining and windy."
+            }
+        ],
+        "dialogueSpeed": 0.2,
+        "savePreviousAudioFiles": true
     }
 }

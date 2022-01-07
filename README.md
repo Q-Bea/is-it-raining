@@ -26,7 +26,8 @@ Requesting an endpoint that does not exist will cause the server to respond with
 Valid API requests respond with the following payload:
 ```js
 {
-    temperature_c: number, //The degrees in celsius
+    temperature_c_feel: number, //The 'feels like' degrees in celsius
+    temperature_c_real: number, //The real degrees in celsius
     isRaining: boolean,
     wind_kph: number, //
     fromCache: boolean //True if the data was returned from the internal cache rather than pirate weather
