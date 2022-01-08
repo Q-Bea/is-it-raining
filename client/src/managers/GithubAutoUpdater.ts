@@ -1,7 +1,6 @@
 //Check the git status to see if this build is behind, if it is, git pull, tsc, and reboot
 import Main, { BaseManager } from "..";
 import { exec } from "child_process";
-import { stderr } from "process";
 
 export default class GithubAutoUpdateManager extends BaseManager {
     gitUrl: string
