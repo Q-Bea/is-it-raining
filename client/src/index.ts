@@ -11,6 +11,7 @@ import SpeechRequestHandler from "./managers/SpeechRequestHandler"
 import IITRequestManager from "./managers/IITRequestManager"
 import GPIOInterface from "./managers/GPIOInterface"
 import SettingsManager from "./managers/SettingsManager"
+import GithubAutoUpdateManager from "./managers/GithubAutoUpdater"
 
 export interface ConfigData {
     motherDownloadedConfigFilename: string
@@ -37,6 +38,7 @@ export default class Main {
     IITRequestManager: IITRequestManager
     GPIOInterface: GPIOInterface
     SettingsManager: SettingsManager
+    GithubAutoUpdateManager: GithubAutoUpdateManager
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
@@ -48,13 +50,16 @@ export default class Main {
         this.IITRequestManager = new IITRequestManager(this);
         this.GPIOInterface = new GPIOInterface(this);
         this.SettingsManager = new SettingsManager(this);
+        this.GithubAutoUpdateManager = new GithubAutoUpdateManager(this);
     }
 
     start() {
         this.MotherRequestManager.startInterval();
         this.SpeechRequestHandler.setup();
 
-        this.SpeechRequestHandler.ServiceAPI.downloadSpeechFile("Just like last time you asked, it is not currently raining. You should bring you're umbrella though because it might be raining in an hour.")
+        // this.SpeechRequestHandler.ServiceAPI.downloadSpeechFile("Just like last time you asked, it is not currently raining. You should bring you're umbrella though because it might be raining in an hour.")
+
+        this.GithubAutoUpdateManager.fullUpdateRoutine();
     }
 }
 
