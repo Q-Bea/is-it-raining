@@ -2,15 +2,13 @@ import Main, { BaseManager } from "..";
 import { VolumeKnobPercent } from "./GPIOInterface";
 import { type MotherSettings } from "./MotherRequestManager";
 
-export interface MergedSettings extends MotherSettings {
-    volume:VolumeKnobPercent
-}
 export default class SettingsManager extends BaseManager {
     static hardCodedFallbackSettings: MotherSettings = {
         location: {
             type: "latlng",
             value: [49.258500, -123.250640]
         },
+        failOnNoFuture: false,
         dialogueOptions: {
             "pitch": 0,
             "rate": 15,
@@ -22,7 +20,12 @@ export default class SettingsManager extends BaseManager {
         coldFeelThreshold_c: 5,
         windThreshold_kph: 35,
         sayFuturePrediction: true,
-        connectivityIP: "208.67.222.222"
+        connectivityIP: "208.67.222.222",
+        GPIOPollInterval_ms: 500,
+        motherCheckInInterval_ms: 15000,
+        motherDownloadAlsoChecksIn: false,
+        githubUpdateCheckInterval_ms: 1000*60*30
+    
     };
     constructor(Main: Main) {
         super(Main);
@@ -31,7 +34,7 @@ export default class SettingsManager extends BaseManager {
     /**
      * Attempts to get the settings, as they were downloaded from Mother, if a setting is not present in mother, it will fallback to the config setting. If the config setting is missing, it will fallback to the hardcoded setting above
      */
-    getSettings(): MergedSettings {
+    getSettings(): MotherSettings {
         //We will be doing this with a nested object proxy -- Existing data from mother will fallback to the fallback settings via proxy which will fallback to hardcoded
         const savedMother = this.Main.StorageManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.getRawJSON() as MotherSettings|Record<string,unknown>|undefined;
 
@@ -55,19 +58,23 @@ export default class SettingsManager extends BaseManager {
             }
         });
 
-        const fqSettings: MergedSettings = {
-            volume: this.Main.GPIOInterface.readVolumeKnob(),
-            dialogue: motherProxy.dialogue,
-            dialogueOptions: motherProxy.dialogueOptions,
-            location: motherProxy.location,
-            savePreviousAudioFiles: motherProxy.savePreviousAudioFiles,
-            coldFeelThreshold_c: motherProxy.coldFeelThreshold_c,
-            windThreshold_kph: motherProxy.windThreshold_kph,
-            sayFuturePrediction: motherProxy.sayFuturePrediction,
-            connectivityIP: motherProxy.connectivityIP,
-        };
+        // const fqSettings: MotherSettings = {
+        //     dialogue: motherProxy.dialogue,
+        //     dialogueOptions: motherProxy.dialogueOptions,
+        //     location: motherProxy.location,
+        //     savePreviousAudioFiles: motherProxy.savePreviousAudioFiles,
+        //     coldFeelThreshold_c: motherProxy.coldFeelThreshold_c,
+        //     windThreshold_kph: motherProxy.windThreshold_kph,
+        //     sayFuturePrediction: motherProxy.sayFuturePrediction,
+        //     connectivityIP: motherProxy.connectivityIP,
+        //     failOnNoFuture: motherProxy.failOnNoFuture,
+        //     GPIOPollInterval_ms: motherProxy.GPIOPollInterval_ms,
+        //     githubUpdateCheckInterval_ms: motherProxy.githubUpdateCheckInterval_ms,
+        //     motherCheckInInterval_ms: motherProxy.motherCheckInInterval_ms,
+        //     motherDownloadAlsoChecksIn: motherProxy.motherDownloadAlsoChecksIn
+        // };
         
-        return fqSettings;
+        return motherProxy;
     }
 }
 

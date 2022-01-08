@@ -114,15 +114,19 @@ export default class GithubAutoUpdateManager extends BaseManager {
 
     startInterval() {
         if (this.updateCheckInterval) {
+            console.log("[Interval] Deleting Existing Github Interval")
             clearInterval(this.updateCheckInterval);
             this.updateCheckInterval = undefined;
         }
+
+        console.log("[Interval] Starting Github Interval")
+
         this.updateCheckInterval = setInterval(async () => {
             try {
                 await this.fullUpdateRoutine();
             } catch(e) {
                 //
             }
-        }, this.Main.config.githubUpdateCheckInterval_ms);
+        }, this.Main.SettingsManager.getSettings().githubUpdateCheckInterval_ms);
     }
 }

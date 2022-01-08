@@ -1,7 +1,7 @@
 //Responsible for converting an input list of property requests into a relevant dialogue string
 
 import type SpeechRequestHandler from "../SpeechRequestHandler";
-import {sample} from "lodash";
+import {indexOf, max, sample} from "lodash";
 import { ValidAudioFileName } from "./SpeechFileManager";
 
 export type KnownProperties =
@@ -51,61 +51,69 @@ export default class SpeechDialogueManager {
         const availableDialogue = this.getDialogueObjects();
 
         //In case there is multiple with the same score, which is when we pick randomly
-        const contested: number[] = [];
+        const scores: Map<number, number> = new Map();
 
-        let bestMatch:[bestID: number, score: number]|null = null;
+        //There is a special case for audio with 0 properties. Because they could match anything otherwise,
+        //Now, they can only be picked for requests that also have 0 requirements
+        //Because audio with properties not picked can't be chosen, this can be hardcoded
+
+        if (requiredProperties.length === 0) {
+            const noProperties = availableDialogue.filter(dialogue => dialogue.properties.length === 0)
+            if (noProperties.length > 0) return sample(noProperties);
+
+            return undefined;
+        }
+
+        if (requiredProperties.length === 1 && requiredProperties[0] === "Future") {
+            const onlyFuture = availableDialogue.filter(dialogue => dialogue.properties.length === 1 && dialogue.properties[0] === "Future")
+            if (onlyFuture.length > 0) return sample(onlyFuture);
+
+            return undefined;
+        }
 
         availableDialogue.forEach((dialogue, index) => {
             let points = 0;
-            let invalid = false;
-            //There is a special case for audio with 0 properties. Because they could match anything otherwise,
-            //Now, they can only be picked for requests that also have 0 requirements
 
             //There is also a special case for Future text, Future dialogs and current dialogs cannot mingle
-            if (requiredProperties.includes("Future") && dialogue.properties.includes("Future") === false) return;
+            if (requiredProperties.includes("Future") && (dialogue.properties.includes("Future") === false)) return;
 
             //The reverse of this is covered already from that rule that dialogue with addition rules cannot be picked
 
-            if (dialogue.properties.length === 0 && requiredProperties.length === 0) {
-                if (bestMatch !== null) bestMatch = null;
-                contested.push(index);
-                return
-            } else {
-                for (const property of dialogue.properties) {
-                    if (requiredProperties.includes(property)) {
-                        points += 1;
-                    } else {
-                        invalid = true;
-                        break;
-                    }
-                }
+            for (const property of dialogue.properties) {
+                if (!requiredProperties.includes(property)) return;
+
+                points += 1;
             }
 
-            //Dialogue contained a property isn't represented by the current weather
-            if (invalid) return;
-
-            if (bestMatch === null || bestMatch[1] < points) {
-                bestMatch = [index, points];
-                contested.length = 0;
-            } else {
-                if (bestMatch && bestMatch[1] === points) {
-                    contested.push(bestMatch[0]);
-                    bestMatch = [index, points];
-                }
-            }
+            scores.set(index, points);
         });
 
-        if (bestMatch) {
-            contested.push(bestMatch[0]);
-        } 
-        
-        if (contested.length >= 1) {
-            return availableDialogue[sample(contested)!];
-        } else {
-            const wildcards = availableDialogue.filter(dialogue => dialogue.properties.length === 1 && dialogue.properties[0] === "*")
+        if (scores.size === 0) {
+            //If there were no valid weathers we select from wildcards
+
+            //Wildcards also cannot mix between current and future forcasts
+            let wildcards;
+            if (requiredProperties.includes("Future")) {
+                wildcards = availableDialogue.filter(dialogue => dialogue.properties.length === 2 && dialogue.properties.includes("*") && dialogue.properties.includes("Future"))
+            } else {
+                wildcards = availableDialogue.filter(dialogue => dialogue.properties.length === 1 && dialogue.properties[0] === "*")
+            }
             if (wildcards.length > 0) return sample(wildcards);
 
             return undefined;
         }
+
+        const maxScores: [index: number, score: number][] = [];
+        //Otherwise, we get the dialogue with the most points
+        scores.forEach((score, index) => {
+            if (maxScores.length === 0 || score > maxScores[0][1]) {
+                maxScores.length = 0;
+                maxScores.push([index, score]);
+            } else if (score == maxScores[0][1]) {
+                maxScores.push([index, score])
+            }
+        });
+
+        return availableDialogue[sample(maxScores)![0]]
     }
 }

@@ -67,7 +67,7 @@ export default class IITRequestManager extends BaseManager {
             properties[0].push("Cold");
         }
 
-        if (iitData.wind_kph <= currentSettings.windThreshold_kph) {
+        if (iitData.wind_kph >= currentSettings.windThreshold_kph) {
             properties[0].push("Windy");
         }
 

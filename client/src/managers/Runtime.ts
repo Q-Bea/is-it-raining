@@ -57,20 +57,27 @@ export default class RuntimeManager extends BaseManager {
             return;
         }
         console.debug("[Good] Parsed IIT Current Data")
-        console.dir(currentAudio)
 
         if (this.Main.SettingsManager.getSettings().sayFuturePrediction) {
             const futureAudio = this.Main.SpeechRequestHandler.getDialogueObjectFromRequiredProperties(parsedIIT[1]);
             if (futureAudio) {
-                audioObjectsToPlay.push(futureAudio);
+                //If the both now and the future aren't raining, then theres no reason to say the future
+                if (!currentAudio.properties.includes("Raining") && !futureAudio.properties.includes("Raining")) {
+                    console.debug("[Good] Present and Future not raining, skipping future dialogue...")
+                } else {
+                    audioObjectsToPlay.push(futureAudio);
+                }
             } else {
-                this.failState(RuntimeErrors.NoPropertiesForFutureWeather);
-                return;
+                if (this.Main.SettingsManager.getSettings().failOnNoFuture) {
+                    this.failState(RuntimeErrors.NoPropertiesForFutureWeather);
+                    return;
+                }
+                console.debug("[WARN] Failed to parse IIT Future Data, continuing anyway...")
             }
             console.debug("[Good] Parsed IIT Future Data")
-            console.dir(futureAudio);
         }
 
+        console.log("Selected audio for request:")
         console.dir(audioObjectsToPlay);
 
         //Generate audio
@@ -78,7 +85,7 @@ export default class RuntimeManager extends BaseManager {
         for (const audio of audioObjectsToPlay) {
             generateAudioPromises.push(this.Main.SpeechRequestHandler.ensureExistingAudio(audio.fileName, AudioFileType.GENERATED, audio.text));
         }
-        console.debug("[Good] Generated Audio")
+        console.debug("[Good] Generated Audio Files")
 
 
         const results = await Promise.allSettled(generateAudioPromises);
@@ -95,7 +102,7 @@ export default class RuntimeManager extends BaseManager {
     }
 
     private async failState(reason: RuntimeErrors) {
-        this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([Date.now(), `Runtime Error: ${reason}`]);
+        this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([`Runtime_${Date.now()}`, `Runtime Error: ${reason}`]);
         console.error(`Runtime Error! Code ${reason}`)
         if (reason === RuntimeErrors.NoInternet) {
             const attemptNoWifi = await this.Main.SpeechRequestHandler.streamAudio(this.Main.noConnectionFileName, AudioFileType.INTERNAL); 

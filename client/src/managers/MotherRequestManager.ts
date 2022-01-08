@@ -1,4 +1,4 @@
-import Main, { BaseManager } from "..";
+import Main, { BaseManager, IntervalIDs } from "..";
 import axios from "axios";
 import { DialogueObject } from "./speechSubRoutine/SpeechDialogueManager";
 
@@ -20,12 +20,18 @@ export interface MotherSettings {
         speaker: string,
         style: "assistant"|"chat"|"newscast"|"customerservice"
     },
+    failOnNoFuture: boolean
     savePreviousAudioFiles: boolean
     location: locationObject_latlng|locationObject_locationQuery
     coldFeelThreshold_c: number
     windThreshold_kph: number
     sayFuturePrediction: boolean
     connectivityIP: `${number}.${number}.${number}.${number}`
+    GPIOPollInterval_ms: number
+    motherCheckInInterval_ms: number
+    motherDownloadAlsoChecksIn: boolean
+    githubUpdateCheckInterval_ms: number
+
 }
 
 export interface MotherConfigData {
@@ -40,15 +46,32 @@ export default class MotherRequestManager extends BaseManager {
 
     startInterval() {
         if (this.checkInDownloadInterval) {
+            console.log("[Interval] Deleting Existing Mother Interval")
+
             clearInterval(this.checkInDownloadInterval);
             this.checkInDownloadInterval = undefined;
         }
+        console.log("[Interval] Starting Mother Interval")
+
         this.checkInDownloadInterval = setInterval(async () => {
             const fileData = await this.checkInDownload(true);
+            const existingSettings = this.Main.SettingsManager.getSettings();
             if (fileData) {
+                if (fileData.settings.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
+                    this.Main.stageIntervalToRestart(IntervalIDs.Mother)
+                }
+                if (fileData.settings.GPIOPollInterval_ms !== existingSettings.GPIOPollInterval_ms) {
+                    this.Main.stageIntervalToRestart(IntervalIDs.GPIO)
+                }
+                if (fileData.settings.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
+                    this.Main.stageIntervalToRestart(IntervalIDs.Github)
+                }
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
+
+                this.Main.executeIntervalRestart();
             }
-        }, this.Main.config.motherCheckInInterval_ms);
+
+        }, this.Main.SettingsManager.getSettings().motherCheckInInterval_ms);
     }
 
     async checkInDownload(intervalBased = false): Promise<MotherConfigData|undefined> {
@@ -69,7 +92,7 @@ export default class MotherRequestManager extends BaseManager {
             //if this is the case, mother won't have acknowledged our request so we should try to check in
             wasError = true;
         } finally {
-            if (intervalBased && (wasError || !this.Main.config.motherDownloadAlsoChecksIn)) {
+            if (intervalBased && (wasError || !this.Main.SettingsManager.getSettings().motherDownloadAlsoChecksIn)) {
                 axios({
                     url: `https://mother.beamacdonald.ca/checkin/${this.Main.auth.motherAuthToken}`,
                     method: "GET",

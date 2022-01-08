@@ -110,7 +110,8 @@
                                 "type": "array",
                                 "description": "A keyword based array of descriptors about the conditions of activating this line",
                                 "items": {
-                                    "type": "string"
+                                    "type": "string",
+                                    "enum": ["Future","Cold","Raining","*","RecentlyAsked","Windy"]
                                 },
                                 "uniqueItems": true,
                                 "additionalItems": false
@@ -137,8 +138,33 @@
                     "fallbackSettings": {
                         "type": "object",
                         "description": "Fallback settings if Mother is unavilable",
-                        "required": ["savePreviousAudioFiles", "location", "dialogue", "dialogueOptions", "coldFeelThreshold_c", "windThreshold_kph", "sayFuturePrediction", "connectivityIP"],
+                        "required": [
+                            "savePreviousAudioFiles", 
+                            "location", 
+                            "dialogue", 
+                            "dialogueOptions", 
+                            "coldFeelThreshold_c", 
+                            "windThreshold_kph", 
+                            "sayFuturePrediction", 
+                            "connectivityIP", 
+                            "failOnNoFuture", 
+                            "GPIOPollInterval_ms",
+                            "githubUpdateCheckInterval_ms"
+                        ],
+                        "additionalProperties": false,
                         "properties": {
+                            "GPIOPollInterval_ms": {
+                                "description": "How many milliseconds between GPIO input polls?",
+                                "type": "number",
+                                "minimum": 0,
+                                "maximum": 10000,
+                                "default": 500
+                            },
+                            "failOnNoFuture": {
+                                "description": "If future data is unavailable, should the request fail?",
+                                "type": "boolean",
+                                "default": false
+                            },
                             "connectivityIP": {
                                 "description": "The IP to contact to check internet connectivity",
                                 "type": "string",
@@ -213,22 +239,22 @@
                                 "description": "Cut off for when it is considered windy",
                                 "minimum": 0,
                                 "default": 35
+                            },
+                            "githubUpdateCheckInterval_ms": {
+                                "description": "How often github should be contacted to check for updates (milliseconds)",
+                                "type": "number",
+                                "minimum": 30000
+                            },
+                            "motherCheckInInterval_ms": {
+                                "description": "How long should the client wait between checkins and downloads from Mother (milliseconds)",
+                                "type": "number",
+                                "minimum": 15000,
+                            },
+                            "motherDownloadAlsoChecksIn": {
+                                "description": "If on the Mother server, downloading the config also counts as checking in",
+                                "type": "boolean"
                             }
                         }
-                    },
-                    "motherCheckInInterval_ms": {
-                        "description": "How long should the client wait between checkins and downloads from Mother (milliseconds)",
-                        "type": "number",
-                        "minimum": 15000,
-                    },
-                    "motherDownloadAlsoChecksIn": {
-                        "description": "If on the Mother server, downloading the config also counts as checking in",
-                        "type": "boolean"
-                    },
-                    "githubUpdateCheckInterval_ms": {
-                        "description": "How often github should be contacted to check for updates (milliseconds)",
-                        "type": "number",
-                        "minimum": 30000
                     },
                     "loggingFileName": {
                         "description": "Filename of where to store logs to",
@@ -249,11 +275,8 @@
                 "required": [
                     "motherDownloadedConfigFilename",
                     "fallbackSettings",
-                    "motherCheckInInterval_ms",
-                    "motherDownloadAlsoChecksIn",
                     "gpioButtonPin",
                     "gpioVolumePin",
-                    "githubUpdateCheckInterval_ms",
                     "loggingFileName"
                 ],
                 "additionalProperties": false

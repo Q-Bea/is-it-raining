@@ -2,6 +2,7 @@ import Main, { BaseManager } from "./..";
 import SpeechDialogueManager, { type DialogueObject, KnownProperties } from "./speechSubRoutine/SpeechDialogueManager";
 import SpeechFileManager, { type ValidAudioFileName } from "./speechSubRoutine/SpeechFileManager";
 import SpeechServicesAPI, { VoiceSSMLSettings } from "./speechSubRoutine/SpeechServicesAPI";
+import Speaker from "speaker";
 
 export enum AudioFileType {
     INTERNAL = 0,
@@ -63,19 +64,32 @@ export default class SpeechRequestHandler extends BaseManager {
      * Promise resolves when audio is done playing 
      */
     async streamAudio(fileName: ValidAudioFileName, type: AudioFileType): Promise<boolean> {
-        if (!this.FileManager.checkIfFileExists(fileName, type)) return false;
-
-
-
-        return true;
+        return new Promise((resolve) => {
+            const stream = this.FileManager.streamFromFile(fileName, type);
+            if (stream) {
+                const speaker = new Speaker({
+                    channels: 1,
+                    bitDepth: 16,
+                    sampleRate: 16000
+                })
+    
+                stream.pipe(speaker);
+    
+                stream.on("end", () => {
+                    resolve(true);
+                })
+            } else {
+                resolve(false)
+            }
+        })
     }
 
-    getDialogueObjectFromRequiredProperties(requiredProperties: KnownProperties[]) {
+    getDialogueObjectFromRequiredProperties(requiredProperties: KnownProperties[], ) {
         return this.DialogueManager.requestDialogueObject(requiredProperties);
     }
 
     enqueuePlayingAudio(dialogueObject: DialogueObject) {
-        this.enqueuePlayingAudio(dialogueObject);
+        this.playQueue.push(dialogueObject);
 
         if (!this.isPlaying) this.runPlayer();
     }
@@ -85,6 +99,7 @@ export default class SpeechRequestHandler extends BaseManager {
 
         while (this.playQueue.length > 0) {
             const nextUp = this.playQueue.shift()!;
+            console.log(`Now Playing: ${nextUp.fileName}`)
 
             try {
                 await this.streamAudio(nextUp?.fileName, AudioFileType.GENERATED);

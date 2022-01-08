@@ -1,10 +1,8 @@
 {
     "motherDownloadedConfigFilename": "motherConfig",
-    "motherCheckInInterval_ms": 30000,
-    "motherDownloadAlsoChecksIn": true,
-    "githubUpdateCheckInterval_ms": 1800000,
     "fallbackSettings": {
         "connectivityIP": "208.67.222.222",
+        "failOnNoFuture": false,
         "location": {
             "type": "latlng",
             "value": [49.258500,-123.250640]
@@ -44,9 +42,15 @@
                 "text": "It's not rainy or cold or anything! That means today will be a good day."
             },
             {
-                "fileName": "notRaining.wav",
+                "fileName": "futureNothing.wav",
+                "properties": ["Future"],
+                "text": "In an hour it will probably not be raining or windy."
+
+            },
+            {
+                "fileName": "something.wav",
                 "properties": ["*"],
-                "text": "It is not currently raining."
+                "text": "There is currently weather outside. I don't know what type though."
             },
             {
                 "fileName": "cold.wav",
@@ -60,7 +64,11 @@
             "speaker": "en-US-JennyNeural",
             "style": "assistant"
         },
-        "savePreviousAudioFiles": true
+        "savePreviousAudioFiles": true,
+        "GPIOPollInterval_ms": 500,
+        "motherCheckInInterval_ms": 30000,
+        "motherDownloadAlsoChecksIn": true,
+        "githubUpdateCheckInterval_ms": 1800000
     },
     "loggingFileName": "logs",
     "gpioButtonPin": 0,

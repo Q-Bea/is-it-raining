@@ -29,14 +29,14 @@ export default class SpeechFileManager {
         }
     }
 
-    checkIfFileExists(fileName: ValidAudioFileName, audioFileType: AudioFileType) {
+    checkIfFileExists(fileName: ValidAudioFileName, audioFileType: AudioFileType, overrideNonExistantCheck = false) {
         switch (audioFileType) {
             case AudioFileType.INTERNAL:
                 return fs.existsSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}/${fileName}`);
                 break;
 
             case AudioFileType.GENERATED:
-                if (!this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
+                if (!overrideNonExistantCheck && !this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
                     return false;
                 }
 
@@ -65,6 +65,7 @@ export default class SpeechFileManager {
     }
 
     streamFromFile(fileName: ValidAudioFileName, audioFileType: AudioFileType) {
+        if (!this.checkIfFileExists(fileName, audioFileType, true)) return undefined;
         switch (audioFileType) {
             case AudioFileType.INTERNAL:
                 return fs.createReadStream(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}/${fileName}`);

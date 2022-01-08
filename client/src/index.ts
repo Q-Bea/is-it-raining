@@ -19,12 +19,9 @@ import { type ValidAudioFileName } from "./managers/speechSubRoutine/SpeechFileM
 export interface ConfigData {
     motherDownloadedConfigFilename: string
     fallbackSettings: MotherSettings
-    motherCheckInInterval_ms: number
-    motherDownloadAlsoChecksIn: boolean
     gpioButtonPin: number
     gpioVolumePin: number
     loggingFileName: string
-    githubUpdateCheckInterval_ms: number
 }
 
 export interface AuthData {
@@ -32,6 +29,12 @@ export interface AuthData {
     motherAuthToken: string
     speechServicesAuthToken: string
     speechServicesAuthRegion: string
+}
+
+export enum IntervalIDs {
+    GPIO = 0,
+    Mother = 1,
+    Github = 2,
 }
 
 export default class Main {
@@ -50,6 +53,8 @@ export default class Main {
     readonly noConnectionFileName: ValidAudioFileName = "noConnection1.wav";
     readonly randomErrorFileName: ValidAudioFileName = "randomError1.wav";
     readonly unknownWeatherFileName: ValidAudioFileName = "unknownWeather.wav";
+
+    private intervalToRestart: IntervalIDs[] = []
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
@@ -111,6 +116,33 @@ export default class Main {
             });
         });
     }
+
+
+    async stageIntervalToRestart(id: IntervalIDs) {
+        this.intervalToRestart.push(id);
+    }
+
+    async executeIntervalRestart() {
+        while (this.intervalToRestart.length > 0) {
+            const intervalID = this.intervalToRestart.shift();
+            switch (intervalID) {
+                case IntervalIDs.GPIO:
+                    this.GPIOInterface.startListeners();
+                    break;
+
+                case IntervalIDs.Github:
+                    this.GithubAutoUpdateManager.startInterval();
+                    break;
+
+                case IntervalIDs.Mother:
+                    this.MotherRequestManager.startInterval();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
 }
 
 const authData = require("../auth.json");
@@ -118,7 +150,7 @@ const configData = require("../config.json");
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
-    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "motherCheckInInterval_ms", "motherDownloadAlsoChecksIn"])
+    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "gpioVolumePin","loggingFileName"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...");
     process.exit(1);
