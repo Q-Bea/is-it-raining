@@ -25,13 +25,13 @@ export default class IITRequestManager extends BaseManager {
             let data;
             if (currentSettings.location.type === "latlng") {
                 data = await axios({
-                    url: `https://isitraining.beamacdonald.ca/latlng/${this.Main.auth.isItRainingAuthToken}/${currentSettings.location.value[0]},${currentSettings.location.value[1]}`,
+                    url: `https://isitraining.beamacdonald.ca/${this.Main.auth.isItRainingAuthToken}/latlng/${currentSettings.location.value[0]},${currentSettings.location.value[1]}`,
                     method: "GET",
                     timeout: 10000
                 });
             } else {
                 data = await axios({
-                    url: `https://isitraining.beamacdonald.ca/location/${currentSettings.location.value}`,
+                    url: `https://isitraining.beamacdonald.ca/${this.Main.auth.isItRainingAuthToken}/location/${currentSettings.location.value}`,
                     method: "GET",
                     timeout: 10000
                 });
@@ -53,30 +53,30 @@ export default class IITRequestManager extends BaseManager {
     parseIntoProperties(iitData: IITRequestData): [currentlyProperties: KnownProperties[], futureProperties: KnownProperties[]] {
         const currentSettings = this.Main.SettingsManager.getSettings();
 
-        const properties: [KnownProperties[], KnownProperties[]] = [[],[KnownProperties.Future]];
+        const properties: [KnownProperties[], KnownProperties[]] = [[],["Future"]];
 
         if (iitData.fromCache) {
-            properties[0].push(KnownProperties.RecentlyAsked);
+            properties[0].push("RecentlyAsked");
         }
 
         if (iitData.isRaining) {
-            properties[0].push(KnownProperties.Raining);
+            properties[0].push("Raining");
         }
         
         if (iitData.temperature_c_feel <= currentSettings.coldFeelThreshold_c) {
-            properties[0].push(KnownProperties.Cold);
+            properties[0].push("Cold");
         }
 
         if (iitData.wind_kph <= currentSettings.windThreshold_kph) {
-            properties[0].push(KnownProperties.Windy);
+            properties[0].push("Windy");
         }
 
         if (iitData.nextHour.isRaining) {
-            properties[1].push(KnownProperties.Raining);
+            properties[1].push("Raining");
         }
 
         if (iitData.nextHour.wind_kph) {
-            properties[1].push(KnownProperties.Windy);
+            properties[1].push("Windy");
         }
 
         return properties;

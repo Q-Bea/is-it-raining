@@ -137,7 +137,7 @@
                     "fallbackSettings": {
                         "type": "object",
                         "description": "Fallback settings if Mother is unavilable",
-                        "required": ["savePreviousAudioFiles", "location", "dialogue", "coldFeelThreshold_c", "windThreshold_kph", "sayFuturePrediction", "connectivityIP"],
+                        "required": ["savePreviousAudioFiles", "location", "dialogue", "dialogueOptions", "coldFeelThreshold_c", "windThreshold_kph", "sayFuturePrediction", "connectivityIP"],
                         "properties": {
                             "connectivityIP": {
                                 "description": "The IP to contact to check internet connectivity",
@@ -175,12 +175,33 @@
                                 "default": [""],
                                 "additionalItems": false
                             },
-                            "dialogueSpeed": {
-                                "type": "number",
-                                "minimum": -1,
-                                "maximum": 1,
-                                "description": "Pace of the spoken speech when generated (in percent) relative to 0 (normal speed).",
-                                "default": 0
+                            "dialogueOptions": {
+                                "type": "object",
+                                "required": ["pitch", "rate", "style", "speaker"],
+                                "properties": {
+                                    "pitch": {
+                                        "minimum": -100,
+                                        "maximum": 100,
+                                        "description": "Pitch of the spoken speech when generated (in percent) relative to 0 (normal speed).",
+                                        "default": 0
+                                    },
+                                    "rate": {
+                                        "minimum": -100,
+                                        "maximum": 100,
+                                        "description": "Rate of the spoken speech when generated (in percent) relative to 0 (normal speed).",
+                                        "default": 0
+                                    },
+                                    "style": {
+                                        "description": "Style of the spoken speech when generated. Can be `assistant`, `chat`, `customerservice`, 'newscast`. Not all voices support all styles",
+                                        "default": "assistant",
+                                        "type": "string"
+                                    },
+                                    "speaker": {
+                                        "type": "string",
+                                        "description": "Voice of the speaker. See microsoft docs for available choices.",
+                                        "default": "en-US-JennyNeural"
+                                    }
+                                },
                             },
                             "coldFeelThreshold_c": {
                                 "type": "number",

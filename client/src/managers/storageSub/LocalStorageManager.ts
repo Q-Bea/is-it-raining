@@ -36,11 +36,11 @@ export default class LocalStorageInstanceManager {
         return this;
     }
 
-    createInstance(fileName: string): LocalStorageInstance {
+    createInstance(fileName: string, resetFile = true): LocalStorageInstance {
         if (this.instances.has(fileName)) {
             throw new LocalStorageInstanceAlreadyRegisteredError(`fileName: ${fileName}`);
         } else {
-            const instance = new LocalStorageInstance(this, fileName);
+            const instance = new LocalStorageInstance(this, fileName, resetFile);
             this.instances.set(fileName, instance);
             return instance;
         }
@@ -68,7 +68,7 @@ export class LocalStorageInstance {
     LocalManager: LocalStorageInstanceManager;
     filePath: PathLike;
     fileName: string;
-    constructor(LocalManager: LocalStorageInstanceManager, fileName: string) {
+    constructor(LocalManager: LocalStorageInstanceManager, fileName: string, resetFile=true) {
         this.LocalManager = LocalManager;
         this.filePath = `${this.LocalManager.dataPath}/${fileName}.json`;
         this.fileName = fileName;
@@ -76,7 +76,7 @@ export class LocalStorageInstance {
         if (!this.absolutePathExists()) {
             this.createJSONFile();
         } else {
-            this.resetJSONFile();
+            if (resetFile) this.resetJSONFile();
         }
     }
 

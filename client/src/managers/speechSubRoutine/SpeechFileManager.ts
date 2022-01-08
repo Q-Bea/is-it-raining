@@ -55,10 +55,6 @@ export default class SpeechFileManager {
                 break;
 
             case AudioFileType.GENERATED:
-                if (!this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
-                    return this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}/tmp.wav`;
-                }
-
                 return this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}/${fileName}`;
                 break;
 

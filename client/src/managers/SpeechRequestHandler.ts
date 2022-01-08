@@ -1,7 +1,7 @@
 import Main, { BaseManager } from "./..";
 import SpeechDialogueManager, { type DialogueObject, KnownProperties } from "./speechSubRoutine/SpeechDialogueManager";
 import SpeechFileManager, { type ValidAudioFileName } from "./speechSubRoutine/SpeechFileManager";
-import SpeechServicesAPI from "./speechSubRoutine/SpeechServicesAPI";
+import SpeechServicesAPI, { VoiceSSMLSettings } from "./speechSubRoutine/SpeechServicesAPI";
 
 export enum AudioFileType {
     INTERNAL = 0,
@@ -47,12 +47,16 @@ export default class SpeechRequestHandler extends BaseManager {
     /**
      * If the file name doesn't exist, the audio file will be regenerated now.
      */
-    async ensureExistingAudio(fileName: ValidAudioFileName, type: AudioFileType, dialogue: string): Promise<boolean> {
+    async ensureExistingAudio(fileName: ValidAudioFileName, type: AudioFileType, dialogue: string, dialogueOverrides?: VoiceSSMLSettings): Promise<boolean> {
         if (!this.FileManager.checkIfFileExists(fileName, type)) {
-            return await this.ServiceAPI.downloadSpeechFile(dialogue, fileName, type);
+            return await this.ServiceAPI.downloadSpeechFile(dialogue, fileName, type, dialogueOverrides);
         } else {
             return true;
         }
+    }
+
+    async createOverrideAudio(fileName: ValidAudioFileName, type: AudioFileType, dialogue: string, dialogueOverrides?: VoiceSSMLSettings): Promise<boolean> {
+        return await this.ServiceAPI.downloadSpeechFile(dialogue, fileName, type, dialogueOverrides);
     }
 
     /**
@@ -90,5 +94,6 @@ export default class SpeechRequestHandler extends BaseManager {
         }
 
         this.isPlaying = false;
+        this.Main.SpeechRequestHandler.FileManager.possiblePurge();
     }
 }

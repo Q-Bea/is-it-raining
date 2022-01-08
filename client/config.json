@@ -37,9 +37,29 @@
                 "fileName": "futureRainingWindy.wav",
                 "properties": ["Future", "Raining", "Windy"],
                 "text": "In an hour it will be probably be raining and windy."
+            },
+            {
+                "fileName": "literalNothing.wav",
+                "properties": [],
+                "text": "It's not rainy or cold or anything! That means today will be a good day."
+            },
+            {
+                "fileName": "notRaining.wav",
+                "properties": ["*"],
+                "text": "It is not currently raining."
+            },
+            {
+                "fileName": "cold.wav",
+                "properties": ["Cold"],
+                "text": "It is not currently raining. It is cold, however."
             }
         ],
-        "dialogueSpeed": 0.2,
+        "dialogueOptions": {
+            "pitch": 0,
+            "rate": 15,
+            "speaker": "en-US-JennyNeural",
+            "style": "assistant"
+        },
         "savePreviousAudioFiles": true
     },
     "loggingFileName": "logs",

@@ -7,11 +7,17 @@ export interface MergedSettings extends MotherSettings {
 }
 export default class SettingsManager extends BaseManager {
     static hardCodedFallbackSettings: MotherSettings = {
-        dialogueSpeed: 1.2,
         location: {
             type: "latlng",
-            value: [49.258500,-123.250640]
+            value: [49.258500, -123.250640]
         },
+        dialogueOptions: {
+            "pitch": 0,
+            "rate": 15,
+            "speaker": "en-US-JennyNeural",
+            "style": "assistant"
+        },
+        dialogue: [],
         savePreviousAudioFiles: true,
         coldFeelThreshold_c: 5,
         windThreshold_kph: 35,
@@ -51,7 +57,8 @@ export default class SettingsManager extends BaseManager {
 
         const fqSettings: MergedSettings = {
             volume: this.Main.GPIOInterface.readVolumeKnob(),
-            dialogueSpeed: motherProxy.dialogueSpeed,
+            dialogue: motherProxy.dialogue,
+            dialogueOptions: motherProxy.dialogueOptions,
             location: motherProxy.location,
             savePreviousAudioFiles: motherProxy.savePreviousAudioFiles,
             coldFeelThreshold_c: motherProxy.coldFeelThreshold_c,

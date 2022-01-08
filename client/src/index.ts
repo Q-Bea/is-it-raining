@@ -13,16 +13,12 @@ import IITRequestManager from "./managers/IITRequestManager";
 import GPIOInterface from "./managers/GPIOInterface";
 import SettingsManager from "./managers/SettingsManager";
 import GithubAutoUpdateManager from "./managers/GithubAutoUpdater";
-import { type DialogueObject } from "./managers/speechSubRoutine/SpeechDialogueManager";
 import RuntimeManager from "./managers/Runtime";
 import { type ValidAudioFileName } from "./managers/speechSubRoutine/SpeechFileManager";
 
-export interface ConfigFallbackSettings extends MotherSettings {
-    dialogue: Array<DialogueObject>
-}
 export interface ConfigData {
     motherDownloadedConfigFilename: string
-    fallbackSettings: ConfigFallbackSettings
+    fallbackSettings: MotherSettings
     motherCheckInInterval_ms: number
     motherDownloadAlsoChecksIn: boolean
     gpioButtonPin: number
@@ -53,6 +49,7 @@ export default class Main {
 
     readonly noConnectionFileName: ValidAudioFileName = "noConnection1.wav";
     readonly randomErrorFileName: ValidAudioFileName = "randomError1.wav";
+    readonly unknownWeatherFileName: ValidAudioFileName = "unknownWeather.wav";
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
@@ -69,8 +66,8 @@ export default class Main {
     }
 
     start() {
-        this.StorageManager.createInstance(this.config.motherDownloadedConfigFilename);
-        this.StorageManager.createInstance(this.config.loggingFileName);
+        this.StorageManager.createInstance(this.config.motherDownloadedConfigFilename, false);
+        this.StorageManager.createInstance(this.config.loggingFileName, false);
 
 
         this.MotherRequestManager.startInterval();
@@ -78,8 +75,23 @@ export default class Main {
 
         this.GithubAutoUpdateManager.fullUpdateRoutine();
 
-        this.SpeechRequestHandler.ensureExistingAudio(this.noConnectionFileName, AudioFileType.INTERNAL, "Sorry, I can't connect to the internet right now. If you leave me outside for a bit I might be able to tell you the weather though...");
-        this.SpeechRequestHandler.ensureExistingAudio(this.randomErrorFileName, AudioFileType.INTERNAL, "Something went wrong sorry. you should probably tell someone if this happens frequently.");
+        this.generateInternalAudio();
+
+        this.tmp()
+    }
+
+    private async generateInternalAudio() {
+        if (await this.checkInternetConnection()) {
+            this.SpeechRequestHandler.createOverrideAudio(this.noConnectionFileName, AudioFileType.INTERNAL, "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure it out yourself.");
+            this.SpeechRequestHandler.createOverrideAudio(this.randomErrorFileName, AudioFileType.INTERNAL, "Something went wrong, sorry. You should probably tell someone if this happens frequently.");   
+            this.SpeechRequestHandler.createOverrideAudio(this.unknownWeatherFileName, AudioFileType.INTERNAL, "Honestly, I don't know what's happening outside, good luck though!") 
+        }
+    }
+
+    private tmp() {
+        setTimeout(() => {
+            this.RuntimeManager.makeRequest();
+        }, 2000);
     }
 
     /**

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "onoff": "^6.0.3",
+    "speaker": "^0.5.3"
+  }
+}

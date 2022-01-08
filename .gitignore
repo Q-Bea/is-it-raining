@@ -3,3 +3,4 @@ auth.json
 /**/build/*
 **/db/*
 **/generated/*
+**/audio/*

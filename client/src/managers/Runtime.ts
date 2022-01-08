@@ -35,6 +35,7 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoInternet);
             return;
         }
+        console.debug("[Good] Has Internet")
 
         const IIT = await this.Main.IITRequestManager.makeRequest();
         if (!IIT) {
@@ -42,6 +43,8 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoIITData);
             return;
         }
+        console.debug("[Good] Has IIT Data")
+
 
         const parsedIIT = await this.Main.IITRequestManager.parseIntoProperties(IIT);
         const audioObjectsToPlay: DialogueObject[] = [];
@@ -53,6 +56,8 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoPropertiesForCurrentWeather);
             return;
         }
+        console.debug("[Good] Parsed IIT Current Data")
+        console.dir(currentAudio)
 
         if (this.Main.SettingsManager.getSettings().sayFuturePrediction) {
             const futureAudio = this.Main.SpeechRequestHandler.getDialogueObjectFromRequiredProperties(parsedIIT[1]);
@@ -62,13 +67,19 @@ export default class RuntimeManager extends BaseManager {
                 this.failState(RuntimeErrors.NoPropertiesForFutureWeather);
                 return;
             }
+            console.debug("[Good] Parsed IIT Future Data")
+            console.dir(futureAudio);
         }
+
+        console.dir(audioObjectsToPlay);
 
         //Generate audio
         const generateAudioPromises:Promise<boolean>[] = [];
         for (const audio of audioObjectsToPlay) {
             generateAudioPromises.push(this.Main.SpeechRequestHandler.ensureExistingAudio(audio.fileName, AudioFileType.GENERATED, audio.text));
         }
+        console.debug("[Good] Generated Audio")
+
 
         const results = await Promise.allSettled(generateAudioPromises);
 
@@ -80,18 +91,25 @@ export default class RuntimeManager extends BaseManager {
                 this.Main.SpeechRequestHandler.enqueuePlayingAudio(audioObjectsToPlay[i]);
             }
         }
+        console.debug("[Good] Enqueued Audio")
     }
 
     private async failState(reason: RuntimeErrors) {
+        this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([Date.now(), `Runtime Error: ${reason}`]);
+        console.error(`Runtime Error! Code ${reason}`)
         if (reason === RuntimeErrors.NoInternet) {
             const attemptNoWifi = await this.Main.SpeechRequestHandler.streamAudio(this.Main.noConnectionFileName, AudioFileType.INTERNAL); 
-            if (!attemptNoWifi) {
-                await this.Main.SpeechRequestHandler.streamAudio(this.Main.randomErrorFileName, AudioFileType.INTERNAL); 
+            if (attemptNoWifi) {
+                return
             }
-        } else {
-            await this.Main.SpeechRequestHandler.streamAudio(this.Main.randomErrorFileName, AudioFileType.INTERNAL); 
         }
-
-        this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([Date.now(), `Runtime Error: ${reason}`]);
+        
+        if (reason === RuntimeErrors.NoPropertiesForCurrentWeather) {
+            const attemptUnknownWeather = await this.Main.SpeechRequestHandler.streamAudio(this.Main.unknownWeatherFileName, AudioFileType.INTERNAL); 
+            if (attemptUnknownWeather) {
+                return
+            }
+        }
+        await this.Main.SpeechRequestHandler.streamAudio(this.Main.randomErrorFileName, AudioFileType.INTERNAL); 
     }
 }

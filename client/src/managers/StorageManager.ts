@@ -17,8 +17,8 @@ export default class StorageManager {
         this.instances = new Map();
     }
     
-    createInstance(fileNameNoExt: string): LocalStorageInstance {
-        const newInstance = this.LocalInterfaceManager.createInstance(fileNameNoExt);
+    createInstance(fileNameNoExt: string, resetFile = true): LocalStorageInstance {
+        const newInstance = this.LocalInterfaceManager.createInstance(fileNameNoExt, resetFile);
         this.instances.set(fileNameNoExt, newInstance);
         return newInstance;
     }

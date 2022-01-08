@@ -4,13 +4,13 @@ import type SpeechRequestHandler from "../SpeechRequestHandler";
 import {sample} from "lodash";
 import { ValidAudioFileName } from "./SpeechFileManager";
 
-export enum KnownProperties {
-    Raining = 1,
-    Windy = 2,
-    Cold = 3,
-    Future = 4,
-    RecentlyAsked = 5
-}
+export type KnownProperties =
+    "Raining"|
+    "Windy"|
+    "Cold"|
+    "Future"|
+    "RecentlyAsked"|
+    "*"
 
 export interface DialogueObject {
     text: string
@@ -58,15 +58,29 @@ export default class SpeechDialogueManager {
         availableDialogue.forEach((dialogue, index) => {
             let points = 0;
             let invalid = false;
+            //There is a special case for audio with 0 properties. Because they could match anything otherwise,
+            //Now, they can only be picked for requests that also have 0 requirements
 
-            for (const property of dialogue.properties) {
-                if (requiredProperties.includes(property)) {
-                    points += 1;
-                } else {
-                    invalid = true;
-                    break;
+            //There is also a special case for Future text, Future dialogs and current dialogs cannot mingle
+            if (requiredProperties.includes("Future") && dialogue.properties.includes("Future") === false) return;
+
+            //The reverse of this is covered already from that rule that dialogue with addition rules cannot be picked
+
+            if (dialogue.properties.length === 0 && requiredProperties.length === 0) {
+                if (bestMatch !== null) bestMatch = null;
+                contested.push(index);
+                return
+            } else {
+                for (const property of dialogue.properties) {
+                    if (requiredProperties.includes(property)) {
+                        points += 1;
+                    } else {
+                        invalid = true;
+                        break;
+                    }
                 }
             }
+
             //Dialogue contained a property isn't represented by the current weather
             if (invalid) return;
 
@@ -83,10 +97,14 @@ export default class SpeechDialogueManager {
 
         if (bestMatch) {
             contested.push(bestMatch[0]);
-            if (contested.length > 1) {
-                return availableDialogue[sample(contested)!];
-            }
+        } 
+        
+        if (contested.length >= 1) {
+            return availableDialogue[sample(contested)!];
         } else {
+            const wildcards = availableDialogue.filter(dialogue => dialogue.properties.length === 1 && dialogue.properties[0] === "*")
+            if (wildcards.length > 0) return sample(wildcards);
+
             return undefined;
         }
     }

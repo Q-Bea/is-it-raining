@@ -13,7 +13,13 @@ export interface locationObject_locationQuery {
 }
 
 export interface MotherSettings {
-    dialogueSpeed: number
+    dialogue: DialogueObject[]
+    dialogueOptions: {
+        pitch: number,
+        rate: number,
+        speaker: string,
+        style: "assistant"|"chat"|"newscast"|"customerservice"
+    },
     savePreviousAudioFiles: boolean
     location: locationObject_latlng|locationObject_locationQuery
     coldFeelThreshold_c: number
@@ -41,8 +47,6 @@ export default class MotherRequestManager extends BaseManager {
             const fileData = await this.checkInDownload(true);
             if (fileData) {
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
-
-                this.Main.SpeechRequestHandler.FileManager.possiblePurge();
             }
         }, this.Main.config.motherCheckInInterval_ms);
     }
