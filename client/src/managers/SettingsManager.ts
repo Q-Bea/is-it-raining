@@ -15,8 +15,9 @@ export default class SettingsManager extends BaseManager {
         savePreviousAudioFiles: true,
         coldFeelThreshold_c: 5,
         windThreshold_kph: 35,
-        sayFuturePrediction: true
-    }
+        sayFuturePrediction: true,
+        connectivityIP: "208.67.222.222"
+    };
     constructor(Main: Main) {
         super(Main);
     }
@@ -25,17 +26,41 @@ export default class SettingsManager extends BaseManager {
      * Attempts to get the settings, as they were downloaded from Mother, if a setting is not present in mother, it will fallback to the config setting. If the config setting is missing, it will fallback to the hardcoded setting above
      */
     getSettings(): MergedSettings {
-        const savedMother = this.Main.StorageManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.getRawJSON() as MotherSettings|{}|undefined
+        //We will be doing this with a nested object proxy -- Existing data from mother will fallback to the fallback settings via proxy which will fallback to hardcoded
+        const savedMother = this.Main.StorageManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.getRawJSON() as MotherSettings|Record<string,unknown>|undefined;
+
+        const fallbackProxy = new Proxy(this.Main.config.fallbackSettings, {
+            get: (target, prop) => {
+                if (target[prop as keyof MotherSettings] === undefined) {
+                    return SettingsManager.hardCodedFallbackSettings[prop as keyof MotherSettings];
+                } else {
+                    return (target as MotherSettings)[prop as keyof MotherSettings];
+                }
+            }
+        });
+
+        const motherProxy = new Proxy(savedMother as MotherSettings|undefined ?? {} as MotherSettings, {
+            get: (target, prop) => {
+                if ((target as MotherSettings)[prop as keyof MotherSettings] === undefined) {
+                    return fallbackProxy[prop as keyof MotherSettings];
+                } else {
+                    return (target as MotherSettings)[prop as keyof MotherSettings];
+                }
+            }
+        });
+
         const fqSettings: MergedSettings = {
             volume: this.Main.GPIOInterface.readVolumeKnob(),
-            dialogueSpeed: (savedMother && "dialogueSpeed" in savedMother ? savedMother.dialogueSpeed : this.Main.config.fallbackSettings.dialogueSpeed ?? SettingsManager.hardCodedFallbackSettings.dialogueSpeed),
-            location: (savedMother && "location" in savedMother ? savedMother.location : this.Main.config.fallbackSettings.location ?? SettingsManager.hardCodedFallbackSettings.location),
-            savePreviousAudioFiles: (savedMother && "savePreviousAudioFiles" in savedMother ? savedMother.savePreviousAudioFiles : this.Main.config.fallbackSettings.savePreviousAudioFiles ?? SettingsManager.hardCodedFallbackSettings.savePreviousAudioFiles),
-            coldFeelThreshold_c: (savedMother && "coldFeelThreshold_c" in savedMother ? savedMother.coldFeelThreshold_c : this.Main.config.fallbackSettings.coldFeelThreshold_c ?? SettingsManager.hardCodedFallbackSettings.coldFeelThreshold_c),
-            windThreshold_kph: (savedMother && "windThreshold_kph" in savedMother ? savedMother.windThreshold_kph : this.Main.config.fallbackSettings.windThreshold_kph ?? SettingsManager.hardCodedFallbackSettings.windThreshold_kph),
-            sayFuturePrediction: (savedMother && "sayFuturePrediction" in savedMother ? savedMother.sayFuturePrediction : this.Main.config.fallbackSettings.sayFuturePrediction ?? SettingsManager.hardCodedFallbackSettings.sayFuturePrediction),
+            dialogueSpeed: motherProxy.dialogueSpeed,
+            location: motherProxy.location,
+            savePreviousAudioFiles: motherProxy.savePreviousAudioFiles,
+            coldFeelThreshold_c: motherProxy.coldFeelThreshold_c,
+            windThreshold_kph: motherProxy.windThreshold_kph,
+            sayFuturePrediction: motherProxy.sayFuturePrediction,
+            connectivityIP: motherProxy.connectivityIP,
         };
         
         return fqSettings;
     }
 }
+

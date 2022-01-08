@@ -10,7 +10,7 @@ export default class GPIOInterface extends BaseManager {
     }
 
     startListener() {
-
+        return;
     }
 
     readVolumeKnob(): VolumeKnobPercent {

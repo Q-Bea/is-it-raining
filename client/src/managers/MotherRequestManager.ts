@@ -19,6 +19,7 @@ export interface MotherSettings {
     coldFeelThreshold_c: number
     windThreshold_kph: number
     sayFuturePrediction: boolean
+    connectivityIP: `${number}.${number}.${number}.${number}`
 }
 
 export interface MotherConfigData {
@@ -26,7 +27,7 @@ export interface MotherConfigData {
     settings: MotherSettings
 }
 export default class MotherRequestManager extends BaseManager {
-    checkInDownloadInterval?: NodeJS.Timer
+    checkInDownloadInterval?: NodeJS.Timer;
     constructor(Main: Main) {
         super(Main);
     }
@@ -40,8 +41,10 @@ export default class MotherRequestManager extends BaseManager {
             const fileData = await this.checkInDownload(true);
             if (fileData) {
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
+
+                this.Main.SpeechRequestHandler.FileManager.possiblePurge();
             }
-        }, this.Main.config.motherCheckInInterval_ms)
+        }, this.Main.config.motherCheckInInterval_ms);
     }
 
     async checkInDownload(intervalBased = false): Promise<MotherConfigData|undefined> {
@@ -52,7 +55,7 @@ export default class MotherRequestManager extends BaseManager {
                 url: `https://mother.beamacdonald.ca/config/${this.Main.auth.motherAuthToken}`,
                 method: "GET",
                 timeout: 5000
-            })
+            });
 
             if (fileDataResponse.status === 200) {
                 data = fileDataResponse.data;
@@ -67,12 +70,12 @@ export default class MotherRequestManager extends BaseManager {
                     url: `https://mother.beamacdonald.ca/checkin/${this.Main.auth.motherAuthToken}`,
                     method: "GET",
                     timeout: 5000
-                }).catch(() => {/* */})
+                }).catch(() => {/* */});
             }
+        }
 
-            if (data !== undefined) {
-                return data;
-            }
+        if (data !== undefined) {
+            return data;
         }
     }
 }

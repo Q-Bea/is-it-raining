@@ -5,10 +5,10 @@ import Main from "../";
 type fileName = string
 
 export default class StorageManager {   
-    instances: Map<fileName, LocalStorageInstance>
-    Main: Main
+    instances: Map<fileName, LocalStorageInstance>;
+    Main: Main;
 
-    LocalInterfaceManager: LocalStorageInstanceManager
+    LocalInterfaceManager: LocalStorageInstanceManager;
     constructor(Main: Main) {       
         this.Main = Main;
 
@@ -18,7 +18,7 @@ export default class StorageManager {
     }
     
     createInstance(fileNameNoExt: string): LocalStorageInstance {
-        const newInstance = this.LocalInterfaceManager.createInstance(fileNameNoExt)
+        const newInstance = this.LocalInterfaceManager.createInstance(fileNameNoExt);
         this.instances.set(fileNameNoExt, newInstance);
         return newInstance;
     }

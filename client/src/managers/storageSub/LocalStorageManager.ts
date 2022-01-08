@@ -10,12 +10,12 @@ class JSONFileCorruptOrNonExistentError extends CustomError {}
 class PathInvalidError extends CustomError {}
 class CannotAddPropertyToArray extends CustomError {}
 export default class LocalStorageInstanceManager {
-    dataPath: PathLike
-    instances: Map<string, LocalStorageInstance> = new Map()
-    StorageManager: StorageManager
+    dataPath: PathLike;
+    instances: Map<string, LocalStorageInstance> = new Map();
+    StorageManager: StorageManager;
     
     constructor(StorageManager: StorageManager) {
-        this.dataPath = `${process.cwd()}/data`;
+        this.dataPath = `${StorageManager.Main.ensureCorrectCWD()}/data`;
         this.StorageManager = StorageManager;
         this.createDataDirectory();
     }
@@ -65,9 +65,9 @@ export type SetPath = [...path: Array<string|number>, key: string|number, value:
 export type GetReturns = string|number|boolean|Record<string|number,unknown>|Array<unknown>|null
 
 export class LocalStorageInstance {
-    LocalManager: LocalStorageInstanceManager
-    filePath: PathLike
-    fileName: string
+    LocalManager: LocalStorageInstanceManager;
+    filePath: PathLike;
+    fileName: string;
     constructor(LocalManager: LocalStorageInstanceManager, fileName: string) {
         this.LocalManager = LocalManager;
         this.filePath = `${this.LocalManager.dataPath}/${fileName}.json`;

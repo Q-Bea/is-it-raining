@@ -2,7 +2,9 @@
     "motherDownloadedConfigFilename": "motherConfig",
     "motherCheckInInterval_ms": 30000,
     "motherDownloadAlsoChecksIn": true,
+    "githubUpdateCheckInterval_ms": 1800000,
     "fallbackSettings": {
+        "connectivityIP": "208.67.222.222",
         "location": {
             "type": "latlng",
             "value": [49.258500,-123.250640]
@@ -39,5 +41,8 @@
         ],
         "dialogueSpeed": 0.2,
         "savePreviousAudioFiles": true
-    }
+    },
+    "loggingFileName": "logs",
+    "gpioButtonPin": 0,
+    "gpioVolumePin": 0
 }

@@ -137,8 +137,13 @@
                     "fallbackSettings": {
                         "type": "object",
                         "description": "Fallback settings if Mother is unavilable",
-                        "required": ["savePreviousAudioFiles", "location", "dialogue", "coldFeelThreshold_c", "windThreshold_kph", "sayFuturePrediction"],
+                        "required": ["savePreviousAudioFiles", "location", "dialogue", "coldFeelThreshold_c", "windThreshold_kph", "sayFuturePrediction", "connectivityIP"],
                         "properties": {
+                            "connectivityIP": {
+                                "description": "The IP to contact to check internet connectivity",
+                                "type": "string",
+                                "default": true
+                            },
                             "sayFuturePrediction": {
                                 "description": "Whether or not the future prediction should be included in voice dialogue",
                                 "type": "boolean",
@@ -198,6 +203,26 @@
                     "motherDownloadAlsoChecksIn": {
                         "description": "If on the Mother server, downloading the config also counts as checking in",
                         "type": "boolean"
+                    },
+                    "githubUpdateCheckInterval_ms": {
+                        "description": "How often github should be contacted to check for updates (milliseconds)",
+                        "type": "number",
+                        "minimum": 30000
+                    },
+                    "loggingFileName": {
+                        "description": "Filename of where to store logs to",
+                        "type": "string",
+                        "default": "logs.json"
+                    },
+                    "gpioButtonPin": {
+                        "description": "Pin number on the RPI that the button is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumePin": {
+                        "description": "Pin number on the RPI that the volume knob is connected to",
+                        "type": "number",
+                        "minimum": 0
                     }
                 },
                 "required": [
@@ -205,8 +230,10 @@
                     "fallbackSettings",
                     "motherCheckInInterval_ms",
                     "motherDownloadAlsoChecksIn",
-                    "gpioButtonHeader",
-                    "gpioVolumeHeader",
+                    "gpioButtonPin",
+                    "gpioVolumePin",
+                    "githubUpdateCheckInterval_ms",
+                    "loggingFileName"
                 ],
                 "additionalProperties": false
             }
@@ -214,6 +241,8 @@
     ],
     "cSpell.words": [
         "Behaviour",
-        "latlng"
+        "cognitiveservices",
+        "latlng",
+        "linebreak"
     ]
 }

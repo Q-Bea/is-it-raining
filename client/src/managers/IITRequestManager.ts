@@ -28,13 +28,13 @@ export default class IITRequestManager extends BaseManager {
                     url: `https://isitraining.beamacdonald.ca/latlng/${this.Main.auth.isItRainingAuthToken}/${currentSettings.location.value[0]},${currentSettings.location.value[1]}`,
                     method: "GET",
                     timeout: 10000
-                })
+                });
             } else {
                 data = await axios({
                     url: `https://isitraining.beamacdonald.ca/location/${currentSettings.location.value}`,
                     method: "GET",
                     timeout: 10000
-                })
+                });
             }
 
             if (data.status === 200) {
@@ -53,7 +53,7 @@ export default class IITRequestManager extends BaseManager {
     parseIntoProperties(iitData: IITRequestData): [currentlyProperties: KnownProperties[], futureProperties: KnownProperties[]] {
         const currentSettings = this.Main.SettingsManager.getSettings();
 
-        let properties: [KnownProperties[], KnownProperties[]] = [[],[KnownProperties.Future]];
+        const properties: [KnownProperties[], KnownProperties[]] = [[],[KnownProperties.Future]];
 
         if (iitData.fromCache) {
             properties[0].push(KnownProperties.RecentlyAsked);
