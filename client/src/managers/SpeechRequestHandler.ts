@@ -93,6 +93,14 @@ export default class SpeechRequestHandler extends BaseManager {
 
         if (!this.isPlaying) this.runPlayer();
     }
+
+    async waitForNoAudioPlaying(): Promise<void> {
+        if (!this.isPlaying) return;
+
+        setInterval(() => {
+            if (!this.isPlaying) return;
+        }, 500)
+    }
     
     private async runPlayer() {
         this.isPlaying = true;

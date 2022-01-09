@@ -104,7 +104,11 @@ export default class RuntimeManager extends BaseManager {
         }
         console.debug("[Good] Enqueued Audio")
 
-        
+        await this.Main.SpeechRequestHandler.waitForNoAudioPlaying();
+        console.debug("[Good] Audio finished playing!");
+
+        console.debug("[Good] Request finished!");
+        this.requestInProcess = false;
     }
 
     private async failState(reason: RuntimeErrors) {
