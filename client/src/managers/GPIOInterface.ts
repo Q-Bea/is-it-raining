@@ -20,8 +20,8 @@ export default class GPIOInterface extends BaseManager {
     startListeners() {
         this.watchButton();
 
-        this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, "out");
-        this.volumePin2 = new Gpio(this.Main.config.gpioVolumePinB, "in");
+        this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, "out", "both");
+        this.volumePin2 = new Gpio(this.Main.config.gpioVolumePinB, "in", "both");
 
         this.startVolumeInterval();
     }
@@ -43,7 +43,7 @@ export default class GPIOInterface extends BaseManager {
         console.log("[Interval] Starting GPIO Interval")
 
         this.volumeInterval = setInterval(async () => {
-            const volume = this.readVolumeKnob();
+            const volume = await this.readVolumeKnob();
 
             console.log(volume)
             // try {
@@ -78,6 +78,7 @@ export default class GPIOInterface extends BaseManager {
         let count = 0;
         this.volumePin1?.writeSync(1);
         while (this.volumePin2?.readSync() === 0) {
+            console.log(count)
             count = count + 1;
         }
         return count;
@@ -88,6 +89,7 @@ export default class GPIOInterface extends BaseManager {
         return new Promise((resolve) => {
             this.discharge();
             setTimeout(() => {
+                console.log("reading")
                 resolve(this.charge_time());
             }, 4);
         })
