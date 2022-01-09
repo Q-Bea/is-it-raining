@@ -266,7 +266,12 @@
                         "type": "number",
                         "minimum": 0
                     },
-                    "gpioVolumePin": {
+                    "gpioVolumePinA": {
+                        "description": "Pin number on the RPI that the volume knob is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumePinB": {
                         "description": "Pin number on the RPI that the volume knob is connected to",
                         "type": "number",
                         "minimum": 0
@@ -276,7 +281,8 @@
                     "motherDownloadedConfigFilename",
                     "fallbackSettings",
                     "gpioButtonPin",
-                    "gpioVolumePin",
+                    "gpioVolumePinA",
+                    "gpioVolumePinB",
                     "loggingFileName"
                 ],
                 "additionalProperties": false

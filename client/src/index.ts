@@ -20,7 +20,8 @@ export interface ConfigData {
     motherDownloadedConfigFilename: string
     fallbackSettings: MotherSettings
     gpioButtonPin: number
-    gpioVolumePin: number
+    gpioVolumePinA: number
+    gpioVolumePinB: number
     loggingFileName: string
 }
 
@@ -80,9 +81,11 @@ export default class Main {
 
         this.GithubAutoUpdateManager.fullUpdateRoutine();
 
+        this.GPIOInterface.startListeners();
+
         this.generateInternalAudio();
 
-        this.tmp()
+        // this.tmp()
     }
 
     private async generateInternalAudio() {
@@ -150,7 +153,7 @@ const configData = require("../config.json");
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
-    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "gpioVolumePin","loggingFileName"])
+    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "gpioVolumePinA", "gpioVolumePinB", "loggingFileName"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...");
     process.exit(1);

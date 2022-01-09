@@ -71,6 +71,7 @@
         "githubUpdateCheckInterval_ms": 1800000
     },
     "loggingFileName": "logs",
-    "gpioButtonPin": 0,
-    "gpioVolumePin": 0
+    "gpioButtonPin": 23,
+    "gpioVolumePinA": 15,
+    "gpioVolumePinB": 13
 }
