@@ -3,6 +3,10 @@
 import Main, { BaseManager } from "..";
 import loudness from "loudness";
 import {Gpio} from "onoff";
+const GrovePI = require("grovepi");
+
+const RotaryAngleSensor = GrovePI.sensors.RotaryAnalog;
+const Board = GrovePI.board;
 
 export type VolumeKnobPercent = 0|1|2|3|4|5|6|7|8|9|10
 
@@ -10,8 +14,7 @@ export default class GPIOInterface extends BaseManager {
     private volumeInterval?: NodeJS.Timer
     private buttonInterval?: NodeJS.Timer
 
-    private volumePin1?: Gpio;
-    private volumePin2?: Gpio;
+    private board: any;
 
     constructor(Main: Main) {
         super(Main);
@@ -20,10 +23,26 @@ export default class GPIOInterface extends BaseManager {
     startListeners() {
         this.watchButton();
 
-        this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, "out", "both");
-        this.volumePin2 = new Gpio(this.Main.config.gpioVolumePinB, "in", "both");
-
-        this.startVolumeInterval();
+        // this.startVolumeInterval();
+        this.board = new Board({
+            debug: true,
+            onError: (err: any) => {
+                console.log('Something wrong just happened')
+                console.log(err)
+            },
+            onInit: (res: any) => {
+                if (res) {
+                    console.log('GrovePi Version :: ' + this.board.version())
+            
+                    var rotarySensor = new RotaryAngleSensor(this.Main.config.gpioVolumePin)
+                    console.log('Rot Ang (start watch)')
+                    rotarySensor.on('change', function(res: any) {
+                        console.log('Rot onChange value=' + res)
+                    })
+                    rotarySensor.watch()
+                }
+            }
+        })
     }
 
     private watchButton() {
@@ -34,69 +53,38 @@ export default class GPIOInterface extends BaseManager {
         })
     }
 
-    private startVolumeInterval() {
-        if (this.volumeInterval) {
-            console.log("[Interval] Deleting Existing GPIO Interval")
-            clearInterval(this.volumeInterval);
-            this.volumeInterval = undefined;
-        }
-        console.log("[Interval] Starting GPIO Interval")
+    // private startVolumeInterval() {
+    //     if (this.volumeInterval) {
+    //         console.log("[Interval] Deleting Existing GPIO Interval")
+    //         clearInterval(this.volumeInterval);
+    //         this.volumeInterval = undefined;
+    //     }
+    //     console.log("[Interval] Starting GPIO Interval")
 
-        this.volumeInterval = setInterval(async () => {
-            const volume = await this.readVolumeKnob();
+    //     this.volumeInterval = setInterval(async () => {
+    //         const volume = await this.readVolumeKnob();
 
-            console.log(volume)
-            // try {
+    //         console.log(volume)
+    //         // try {
 
-            //     if (volume == 0) {
-            //         await loudness.setVolume(0);
-            //         loudness.setMuted(true)
-            //     } else {
-            //         if (await loudness.getMuted()) 
-            //         await loudness.setMuted(false)
-            //         loudness.setVolume(volume*10)
-            //     }
-            // } catch(e) {
-            //     console.error("Failed to update sound!")
-            //     this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([`Volume_${Date.now()}`, "Failed to update volume level"])
-            // }
+    //         //     if (volume == 0) {
+    //         //         await loudness.setVolume(0);
+    //         //         loudness.setMuted(true)
+    //         //     } else {
+    //         //         if (await loudness.getMuted()) 
+    //         //         await loudness.setMuted(false)
+    //         //         loudness.setVolume(volume*10)
+    //         //     }
+    //         // } catch(e) {
+    //         //     console.error("Failed to update sound!")
+    //         //     this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([`Volume_${Date.now()}`, "Failed to update volume level"])
+    //         // }
 
-        }, this.Main.SettingsManager.getSettings().GPIOPollInterval_ms)
-    }
+    //     }, this.Main.SettingsManager.getSettings().GPIOPollInterval_ms)
+    // }
 
-    
-    private discharge() {
-        
-        this.volumePin1?.setDirection("in");
-        this.volumePin2?.setDirection("out");
-        this.volumePin2?.writeSync(0);
-    }
-
-    private charge_time() {
-        this.volumePin2?.setDirection("in");
-        this.volumePin1?.setDirection("out");
-        let count = 0;
-        this.volumePin1?.writeSync(1);
-        while (this.volumePin2?.readSync() === 0) {
-            console.log(count)
-            count = count + 1;
-        }
-        return count;
-    }
-
-
-    private async readVolumeKnob(): Promise<number> {
-        return new Promise((resolve) => {
-            this.discharge();
-            setTimeout(() => {
-                console.log("reading")
-                resolve(this.charge_time());
-            }, 4);
-        })
-    }
-
-    private readButtonState(): boolean {
-        //TODO
-        return false;
-    }
+    // private readButtonState(): boolean {
+    //     //TODO
+    //     return false;
+    // }
 }

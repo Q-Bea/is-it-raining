@@ -9,6 +9,7 @@
     "axios": "^0.24.0",
     "eslint": "^8.6.0",
     "fs-extra": "^10.0.0",
+    "grovepi": "^3.0.0",
     "lodash": "^4.17.21",
     "loudness": "^0.4.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.19.0",

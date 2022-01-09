@@ -20,8 +20,7 @@ export interface ConfigData {
     motherDownloadedConfigFilename: string
     fallbackSettings: MotherSettings
     gpioButtonPin: number
-    gpioVolumePinA: number
-    gpioVolumePinB: number
+    gpioVolumePin: number
     loggingFileName: string
 }
 
@@ -153,7 +152,7 @@ const configData = require("../config.json");
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
-    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "gpioVolumePinA", "gpioVolumePinB", "loggingFileName"])
+    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "gpioVolumePin", "loggingFileName"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...");
     process.exit(1);
