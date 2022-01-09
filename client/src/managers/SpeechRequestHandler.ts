@@ -106,7 +106,7 @@ export default class SpeechRequestHandler extends BaseManager {
                     resolve();
                     return;
                 }
-            }, 500)
+            }, 250)
         })
     }
     
