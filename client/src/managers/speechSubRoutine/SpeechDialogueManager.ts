@@ -32,13 +32,13 @@ export default class SpeechDialogueManager {
 
         if (downloadedDialogue) {
             for (const object of downloadedDialogue) {
-                if(!dialogue.find(existingObject => { 
-                    if (existingObject.fileName === object.fileName) {
-                        existingObject.properties = object.properties;
-                        existingObject.text = object.text;
-                        return true;
-                    }
-                })) {
+                const existing = dialogue.find(existingObject => existingObject.fileName === object.fileName);
+
+                if (existing) {
+                    existingObject.properties = object.properties;
+                    existingObject.text = object.text;
+                    continue;
+                } else {
                     dialogue.push(object);
                 }
             }
