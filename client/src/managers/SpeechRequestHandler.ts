@@ -95,11 +95,19 @@ export default class SpeechRequestHandler extends BaseManager {
     }
 
     async waitForNoAudioPlaying(): Promise<void> {
-        if (!this.isPlaying && this.playQueue.length == 0) return;
-
-        setInterval(() => {
-            if (!this.isPlaying && this.playQueue.length == 0) return;
-        }, 500)
+        return new Promise(resolve => {
+            if (!this.isPlaying && this.playQueue.length == 0) {
+                resolve();
+                return;
+            }
+    
+            setInterval(() => {
+                if (!this.isPlaying && this.playQueue.length == 0) {
+                    resolve();
+                    return;
+                }
+            }, 500)
+        })
     }
     
     private async runPlayer() {
