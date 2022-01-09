@@ -119,7 +119,6 @@ export default class Main {
         });
     }
 
-
     async stageIntervalToRestart(id: IntervalIDs) {
         this.intervalToRestart.push(id);
     }

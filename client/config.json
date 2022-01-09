@@ -72,5 +72,5 @@
     },
     "loggingFileName": "logs",
     "gpioButtonPin": 23,
-    "gpioVolumePin": 6
+    "gpioVolumePin": 0
 }

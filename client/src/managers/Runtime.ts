@@ -11,11 +11,15 @@ export enum RuntimeErrors {
 }
 
 export default class RuntimeManager extends BaseManager {
+    private requestInProcess = false;
     constructor(Main: Main) {
         super(Main);
     }
 
     async makeRequest(): Promise<void> {
+        if (this.requestInProcess) return;
+
+        this.requestInProcess = true;
         //1) Check if we have internet access
 
         //2) Make request to IIT
@@ -99,6 +103,8 @@ export default class RuntimeManager extends BaseManager {
             }
         }
         console.debug("[Good] Enqueued Audio")
+
+        
     }
 
     private async failState(reason: RuntimeErrors) {
