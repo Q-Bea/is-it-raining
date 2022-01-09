@@ -34,10 +34,6 @@ export interface MotherSettings {
 
 }
 
-export interface MotherConfigData {
-    dialogues: DialogueObject[]
-    settings: MotherSettings
-}
 export default class MotherRequestManager extends BaseManager {
     checkInDownloadInterval?: NodeJS.Timer;
     constructor(Main: Main) {
@@ -57,13 +53,13 @@ export default class MotherRequestManager extends BaseManager {
             const fileData = await this.checkInDownload(true);
             const existingSettings = this.Main.SettingsManager.getSettings();
             if (fileData) {
-                if (fileData.settings.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
+                if (fileData.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
                     this.Main.stageIntervalToRestart(IntervalIDs.Mother)
                 }
-                if (fileData.settings.GPIOPollInterval_ms !== existingSettings.GPIOPollInterval_ms) {
+                if (fileData.GPIOPollInterval_ms !== existingSettings.GPIOPollInterval_ms) {
                     this.Main.stageIntervalToRestart(IntervalIDs.GPIO)
                 }
-                if (fileData.settings.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
+                if (fileData.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
                     this.Main.stageIntervalToRestart(IntervalIDs.Github)
                 }
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
@@ -74,7 +70,7 @@ export default class MotherRequestManager extends BaseManager {
         }, this.Main.SettingsManager.getSettings().motherCheckInInterval_ms);
     }
 
-    async checkInDownload(intervalBased = false): Promise<MotherConfigData|undefined> {
+    async checkInDownload(intervalBased = false): Promise<MotherSettings|undefined> {
         let wasError = false;
         let data = undefined;
         try {
