@@ -22,6 +22,8 @@ export default class GPIOInterface extends BaseManager {
 
         this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, "out");
         this.volumePin2 = new Gpio(this.Main.config.gpioVolumePinB, "in");
+
+        this.startVolumeInterval();
     }
 
     private watchButton() {
