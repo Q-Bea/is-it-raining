@@ -39,7 +39,7 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoInternet);
             return;
         }
-        console.debug("[Good] Has Internet")
+        console.debug("[Good] Has Internet");
 
         const IIT = await this.Main.IITRequestManager.makeRequest();
         if (!IIT) {
@@ -47,7 +47,7 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoIITData);
             return;
         }
-        console.debug("[Good] Has IIT Data")
+        console.debug("[Good] Has IIT Data");
 
 
         const parsedIIT = await this.Main.IITRequestManager.parseIntoProperties(IIT);
@@ -60,14 +60,14 @@ export default class RuntimeManager extends BaseManager {
             this.failState(RuntimeErrors.NoPropertiesForCurrentWeather);
             return;
         }
-        console.debug("[Good] Parsed IIT Current Data")
+        console.debug("[Good] Parsed IIT Current Data");
 
         if (this.Main.SettingsManager.getSettings().sayFuturePrediction) {
             const futureAudio = this.Main.SpeechRequestHandler.getDialogueObjectFromRequiredProperties(parsedIIT[1]);
             if (futureAudio) {
                 //If the both now and the future aren't raining, then theres no reason to say the future
                 if (!currentAudio.properties.includes("Raining") && !futureAudio.properties.includes("Raining")) {
-                    console.debug("[Good] Present and Future not raining, skipping future dialogue...")
+                    console.debug("[Good] Present and Future not raining, skipping future dialogue...");
                 } else {
                     audioObjectsToPlay.push(futureAudio);
                 }
@@ -76,12 +76,12 @@ export default class RuntimeManager extends BaseManager {
                     this.failState(RuntimeErrors.NoPropertiesForFutureWeather);
                     return;
                 }
-                console.debug("[WARN] Failed to parse IIT Future Data, continuing anyway...")
+                console.debug("[WARN] Failed to parse IIT Future Data, continuing anyway...");
             }
-            console.debug("[Good] Parsed IIT Future Data")
+            console.debug("[Good] Parsed IIT Future Data");
         }
 
-        console.log("Selected audio for request:")
+        console.log("Selected audio for request:");
         console.dir(audioObjectsToPlay);
 
         //Generate audio
@@ -89,7 +89,7 @@ export default class RuntimeManager extends BaseManager {
         for (const audio of audioObjectsToPlay) {
             generateAudioPromises.push(this.Main.SpeechRequestHandler.ensureExistingAudio(audio.fileName, AudioFileType.GENERATED, audio.text));
         }
-        console.debug("[Good] Generated Audio Files")
+        console.debug("[Good] Generated Audio Files");
 
 
         const results = await Promise.allSettled(generateAudioPromises);
@@ -102,7 +102,7 @@ export default class RuntimeManager extends BaseManager {
                 this.Main.SpeechRequestHandler.enqueuePlayingAudio(audioObjectsToPlay[i]);
             }
         }
-        console.debug("[Good] Enqueued Audio")
+        console.debug("[Good] Enqueued Audio");
 
         await this.Main.SpeechRequestHandler.waitForNoAudioPlaying();
         console.debug("[Good] Audio finished playing!");
@@ -113,18 +113,18 @@ export default class RuntimeManager extends BaseManager {
 
     private async failState(reason: RuntimeErrors) {
         this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([`Runtime_${Date.now()}`, `Runtime Error: ${reason}`]);
-        console.error(`Runtime Error! Code ${reason}`)
+        console.error(`Runtime Error! Code ${reason}`);
         if (reason === RuntimeErrors.NoInternet) {
             const attemptNoWifi = await this.Main.SpeechRequestHandler.streamAudio(this.Main.noConnectionFileName, AudioFileType.INTERNAL); 
             if (attemptNoWifi) {
-                return
+                return;
             }
         }
         
         if (reason === RuntimeErrors.NoPropertiesForCurrentWeather) {
             const attemptUnknownWeather = await this.Main.SpeechRequestHandler.streamAudio(this.Main.unknownWeatherFileName, AudioFileType.INTERNAL); 
             if (attemptUnknownWeather) {
-                return
+                return;
             }
         }
         await this.Main.SpeechRequestHandler.streamAudio(this.Main.randomErrorFileName, AudioFileType.INTERNAL); 

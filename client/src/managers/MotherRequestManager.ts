@@ -1,6 +1,7 @@
 import Main, { BaseManager, IntervalIDs } from "..";
 import axios from "axios";
 import { DialogueObject } from "./speechSubRoutine/SpeechDialogueManager";
+import { AudioFileType } from "./SpeechRequestHandler";
 
 export interface locationObject_latlng {
     type: "latlng",
@@ -42,26 +43,39 @@ export default class MotherRequestManager extends BaseManager {
 
     startInterval() {
         if (this.checkInDownloadInterval) {
-            console.log("[Interval] Deleting Existing Mother Interval")
+            console.log("[Interval] Deleting Existing Mother Interval");
 
             clearInterval(this.checkInDownloadInterval);
             this.checkInDownloadInterval = undefined;
         }
-        console.log("[Interval] Starting Mother Interval")
+        console.log("[Interval] Starting Mother Interval");
 
         this.checkInDownloadInterval = setInterval(async () => {
             const fileData = await this.checkInDownload(true);
             const existingSettings = this.Main.SettingsManager.getSettings();
             if (fileData) {
                 if (fileData.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
-                    this.Main.stageIntervalToRestart(IntervalIDs.Mother)
+                    this.Main.stageIntervalToRestart(IntervalIDs.Mother);
                 }
                 if (fileData.GPIOPollInterval_ms !== existingSettings.GPIOPollInterval_ms) {
-                    this.Main.stageIntervalToRestart(IntervalIDs.GPIO)
+                    this.Main.stageIntervalToRestart(IntervalIDs.GPIO);
                 }
                 if (fileData.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
-                    this.Main.stageIntervalToRestart(IntervalIDs.Github)
+                    this.Main.stageIntervalToRestart(IntervalIDs.Github);
                 }
+
+                //We also want to check if new dialogue overrides were created and delete generated audio if so
+                if (fileData.dialogue) {
+                    for (const object of fileData.dialogue) {
+                        const existingObject = this.Main.SpeechRequestHandler.DialogueManager.getObjectByFilename(object.fileName);
+                        if (existingObject) {
+                            if (object.text !== existingObject.text) {
+                                this.Main.SpeechRequestHandler.FileManager.deleteSpecificFile(object.fileName, AudioFileType.GENERATED);
+                            }
+                        }
+                    }
+                }
+
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
 
                 this.Main.executeIntervalRestart();

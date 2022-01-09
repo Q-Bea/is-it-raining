@@ -51,14 +51,14 @@ export default class SpeechServicesAPI {
             pitch: options?.pitch ?? motherSettings.pitch,
             rate: options?.rate ?? motherSettings.rate,
             style: options?.style ?? motherSettings.style
-        }
+        };
 
         return `
         <speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="en-US">
             <voice name="${settings.speaker}" style="${settings.style}">
                 <prosody rate="${settings.rate}%" pitch="${settings.pitch}%">${text}</prosody>
             </voice>
-        </speak>`
+        </speak>`;
     }
 }
 

@@ -71,17 +71,17 @@ export default class SpeechRequestHandler extends BaseManager {
                     channels: 1,
                     bitDepth: 16,
                     sampleRate: 16000
-                })
+                });
     
                 stream.pipe(speaker);
     
                 stream.on("end", () => {
                     resolve(true);
-                })
+                });
             } else {
-                resolve(false)
+                resolve(false);
             }
-        })
+        });
     }
 
     getDialogueObjectFromRequiredProperties(requiredProperties: KnownProperties[], ) {
@@ -106,8 +106,8 @@ export default class SpeechRequestHandler extends BaseManager {
                     resolve();
                     return;
                 }
-            }, 250)
-        })
+            }, 250);
+        });
     }
     
     private async runPlayer() {
@@ -115,7 +115,7 @@ export default class SpeechRequestHandler extends BaseManager {
 
         while (this.playQueue.length > 0) {
             const nextUp = this.playQueue.shift()!;
-            console.log(`Now Playing: ${nextUp.fileName}`)
+            console.log(`Now Playing: ${nextUp.fileName}`);
 
             try {
                 await this.streamAudio(nextUp?.fileName, AudioFileType.GENERATED);

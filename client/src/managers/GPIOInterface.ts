@@ -3,26 +3,24 @@
 import Main, { BaseManager } from "..";
 import {Gpio} from "onoff";
 
-export type VolumeKnobPercent = 0|1|2|3|4|5|6|7|8|9|10
-
 export default class GPIOInterface extends BaseManager {
     constructor(Main: Main) {
         super(Main);
     }
 
     startListeners() {
-        console.log("[Interval] Starting GPIO Interval")
+        console.log("[Interval] Starting GPIO Interval");
         this.watchButton();
     }
 
     private watchButton() {
         const button = new Gpio(this.Main.config.gpioButtonPin, "in", "rising", {debounceTimeout: 100});
 
-        button.watch((e, v) => {
+        button.watch(() => {
             console.log("Button Pressed. Launching Request!");
 
             this.Main.RuntimeManager.makeRequest();
             return;
-        })
+        });
     }
 }

@@ -29,14 +29,14 @@ export default class SpeechFileManager {
         }
     }
 
-    checkIfFileExists(fileName: ValidAudioFileName, audioFileType: AudioFileType, overrideNonExistantCheck = false) {
+    checkIfFileExists(fileName: ValidAudioFileName, audioFileType: AudioFileType, overrideNonExistentCheck = false) {
         switch (audioFileType) {
             case AudioFileType.INTERNAL:
                 return fs.existsSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}/${fileName}`);
                 break;
 
             case AudioFileType.GENERATED:
-                if (!overrideNonExistantCheck && !this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
+                if (!overrideNonExistentCheck && !this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
                     return false;
                 }
 
@@ -86,6 +86,26 @@ export default class SpeechFileManager {
     possiblePurge() {
         if (!this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
             fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+        }
+    }
+
+    deleteSpecificFile(fileName: ValidAudioFileName, audioFileType: AudioFileType) {
+        if (!this.checkIfFileExists(fileName, audioFileType, true)) return undefined;
+        switch (audioFileType) {
+            case AudioFileType.INTERNAL:
+                if (fs.existsSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}/${fileName}`)) {
+                    fs.rmSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}/${fileName}`);
+                }
+                break;
+
+            case AudioFileType.GENERATED:
+                if (fs.existsSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}/${fileName}`)) {
+                    fs.rmSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}/${fileName}`);
+                }                
+                break;
+
+            default:
+                return undefined;
         }
     }
 }

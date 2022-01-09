@@ -1,5 +1,4 @@
 import Main, { BaseManager } from "..";
-import { VolumeKnobPercent } from "./GPIOInterface";
 import { type MotherSettings } from "./MotherRequestManager";
 
 export default class SettingsManager extends BaseManager {

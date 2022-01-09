@@ -53,7 +53,7 @@ export default class Main {
     readonly randomErrorFileName: ValidAudioFileName = "randomError1.wav";
     readonly unknownWeatherFileName: ValidAudioFileName = "unknownWeather.wav";
 
-    private intervalToRestart: IntervalIDs[] = []
+    private intervalToRestart: IntervalIDs[] = [];
 
     constructor(auth: AuthData, config: ConfigData) {
         this.auth = auth;
@@ -91,7 +91,7 @@ export default class Main {
         if (await this.checkInternetConnection()) {
             this.SpeechRequestHandler.createOverrideAudio(this.noConnectionFileName, AudioFileType.INTERNAL, "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure it out yourself.");
             this.SpeechRequestHandler.createOverrideAudio(this.randomErrorFileName, AudioFileType.INTERNAL, "Something went wrong, sorry. You should probably tell someone if this happens frequently.");   
-            this.SpeechRequestHandler.createOverrideAudio(this.unknownWeatherFileName, AudioFileType.INTERNAL, "Honestly, I don't know what's happening outside, good luck though!") 
+            this.SpeechRequestHandler.createOverrideAudio(this.unknownWeatherFileName, AudioFileType.INTERNAL, "Honestly, I don't know what's happening outside, good luck though!"); 
         }
     }
 
@@ -163,7 +163,7 @@ new Main(authData, configData).start();
 function checkValidConfig(data: Record<string, unknown>, requiredKeys: string[]): boolean {
     for (const key of requiredKeys) {
         if (data[key] === undefined) {
-            console.log(`MISSING ${key}`)
+            console.log(`MISSING ${key}`);
             return false;
         }
     }
