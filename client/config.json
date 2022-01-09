@@ -55,7 +55,12 @@
             {
                 "fileName": "cold.wav",
                 "properties": ["Cold"],
-                "text": "It is not currently raining. It is cold, however."
+                "text": "It is cold, but at least it isn't raining!"
+            },
+            {
+                "fileName": "recentCold.wav",
+                "properties": ["RecentlyAsked", "Cold"],
+                "text": "Just like last time you asked, it still isn't raining and it still is cold."
             }
         ],
         "dialogueOptions": {
