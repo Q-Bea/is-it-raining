@@ -78,7 +78,7 @@ export default class Main {
         this.MotherRequestManager.startInterval();
         this.SpeechRequestHandler.setup();
 
-        this.GithubAutoUpdateManager.fullUpdateRoutine();
+        this.GithubAutoUpdateManager.startInterval();
 
         this.GPIOInterface.startListeners();
 

@@ -24,8 +24,10 @@ export default class GPIOInterface extends BaseManager {
         const button = new Gpio(this.Main.config.gpioButtonPin, "in", "rising", {debounceTimeout: 100});
 
         button.watch((e, v) => {
-            console.log("Button Pressed")
-            return 
+            console.log("Button Pressed. Launching Request!");
+
+            this.Main.RuntimeManager.makeRequest();
+            return;
         })
     }
 }
