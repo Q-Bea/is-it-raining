@@ -10,8 +10,8 @@ export default class GPIOInterface extends BaseManager {
     private volumeInterval?: NodeJS.Timer
     private buttonInterval?: NodeJS.Timer
 
-    private volumePin1: Gpio;
-    private volumePin2: Gpio;
+    private volumePin1?: Gpio;
+    private volumePin2?: Gpio;
 
     constructor(Main: Main) {
         super(Main);
@@ -20,7 +20,8 @@ export default class GPIOInterface extends BaseManager {
     startListeners() {
         this.watchButton();
 
-        this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, )
+        this.volumePin1 = new Gpio(this.Main.config.gpioVolumePinA, "out");
+        this.volumePin2 = new Gpio(this.Main.config.gpioVolumePinB, "in");
     }
 
     private watchButton() {
@@ -41,6 +42,8 @@ export default class GPIOInterface extends BaseManager {
 
         this.volumeInterval = setInterval(async () => {
             const volume = this.readVolumeKnob();
+
+            console.log(volume)
             // try {
 
             //     if (volume == 0) {
@@ -62,27 +65,30 @@ export default class GPIOInterface extends BaseManager {
     
     private discharge() {
         
-        GPIO.setup(pin_a, GPIO.IN)
-        GPIO.setup(pin_b, GPIO.OUT)
-        GPIO.output(pin_b, False)
-        time.sleep(0.004)
+        this.volumePin1?.setDirection("in");
+        this.volumePin2?.setDirection("out");
+        this.volumePin2?.writeSync(0);
     }
 
     private charge_time() {
-        GPIO.setup(pin_b, GPIO.IN)
-        GPIO.setup(pin_a, GPIO.OUT)
-        count = 0
-        GPIO.output(pin_a, True)
-        while not GPIO.input(b_pin):
-        count = count + 1
-        return count
+        this.volumePin2?.setDirection("in");
+        this.volumePin1?.setDirection("out");
+        let count = 0;
+        this.volumePin1?.writeSync(1);
+        while (this.volumePin2?.readSync() === 0) {
+            count = count + 1;
+        }
+        return count;
     }
 
 
-    private readVolumeKnob(): VolumeKnobPercent {
-
-        //TODO
-        return 4;
+    private async readVolumeKnob(): Promise<number> {
+        return new Promise((resolve) => {
+            this.discharge();
+            setTimeout(() => {
+                resolve(this.charge_time());
+            }, 4);
+        })
     }
 
     private readButtonState(): boolean {
