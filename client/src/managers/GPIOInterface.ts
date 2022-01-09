@@ -3,7 +3,7 @@
 import Main, { BaseManager } from "..";
 import loudness from "loudness";
 import {Gpio} from "onoff";
-const GrovePI = require("grovepi");
+const GrovePI = require("grovepi").GrovePi;
 
 const RotaryAngleSensor = GrovePI.sensors.RotaryAnalog;
 const Board = GrovePI.board;
@@ -18,12 +18,7 @@ export default class GPIOInterface extends BaseManager {
 
     constructor(Main: Main) {
         super(Main);
-    }
 
-    startListeners() {
-        this.watchButton();
-
-        // this.startVolumeInterval();
         this.board = new Board({
             debug: true,
             onError: (err: any) => {
@@ -43,6 +38,13 @@ export default class GPIOInterface extends BaseManager {
                 }
             }
         })
+    }
+
+    startListeners() {
+        this.watchButton();
+
+        // this.startVolumeInterval();
+        this.board.init();
     }
 
     private watchButton() {
