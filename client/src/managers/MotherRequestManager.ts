@@ -2,6 +2,7 @@ import Main, { BaseManager, IntervalIDs } from "..";
 import axios from "axios";
 import { DialogueObject } from "./speechSubRoutine/SpeechDialogueManager";
 import { AudioFileType } from "./SpeechRequestHandler";
+import { isEqual } from "lodash";
 
 export interface locationObject_latlng {
     type: "latlng",
@@ -64,8 +65,15 @@ export default class MotherRequestManager extends BaseManager {
                     this.Main.stageIntervalToRestart(IntervalIDs.Github);
                 }
 
+                let purged;
+                if (fileData.dialogueOptions && !isEqual(existingSettings.dialogueOptions, fileData.dialogueOptions)) {
+                    this.Main.SpeechRequestHandler.FileManager.absolutePurge();
+                    purged = true;
+                }
+
                 //We also want to check if new dialogue overrides were created and delete generated audio if so
-                if (fileData.dialogue) {
+                if (!purged && fileData.dialogue) {
+                    //If we purged, there's no point doing this, the file don't exist
                     for (const object of fileData.dialogue) {
                         const existingObject = this.Main.SpeechRequestHandler.DialogueManager.getObjectByFilename(object.fileName);
                         if (existingObject) {
