@@ -73,7 +73,7 @@ export default class Main {
         this.StorageManager.createInstance(this.config.motherDownloadedConfigFilename, false);
         this.StorageManager.createInstance(this.config.loggingFileName, false);
 
-
+        this.MotherRequestManager.checkInDownload();
         this.MotherRequestManager.startInterval();
         this.SpeechRequestHandler.setup();
 
@@ -163,6 +163,7 @@ new Main(authData, configData).start();
 function checkValidConfig(data: Record<string, unknown>, requiredKeys: string[]): boolean {
     for (const key of requiredKeys) {
         if (data[key] === undefined) {
+            console.log(`MISSING ${key}`)
             return false;
         }
     }
