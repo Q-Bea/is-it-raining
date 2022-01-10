@@ -19,7 +19,9 @@ import { type ValidAudioFileName } from "./managers/speechSubRoutine/SpeechFileM
 export interface ConfigData {
     motherDownloadedConfigFilename: string
     fallbackSettings: MotherSettings
-    gpioButtonPin: number
+    gpioVolumeUpPin: number
+    gpioVolumeDownPin: number
+    gpioRequestPin: number
     loggingFileName: string
 }
 
@@ -151,7 +153,7 @@ const configData = require("../config.json");
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
-    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioButtonPin", "loggingFileName"])
+    !checkValidConfig(configData, ["motherDownloadedConfigFilename", "fallbackSettings", "gpioRequestPin", "gpioVolumeDownPin", "gpioVolumeUpPin", "loggingFileName"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...");
     process.exit(1);

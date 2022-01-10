@@ -148,18 +148,10 @@
                             "sayFuturePrediction", 
                             "connectivityIP", 
                             "failOnNoFuture", 
-                            "GPIOPollInterval_ms",
                             "githubUpdateCheckInterval_ms"
                         ],
                         "additionalProperties": false,
                         "properties": {
-                            "GPIOPollInterval_ms": {
-                                "description": "How many milliseconds between GPIO input polls?",
-                                "type": "number",
-                                "minimum": 0,
-                                "maximum": 10000,
-                                "default": 500
-                            },
                             "failOnNoFuture": {
                                 "description": "If future data is unavailable, should the request fail?",
                                 "type": "boolean",
@@ -261,8 +253,18 @@
                         "type": "string",
                         "default": "logs.json"
                     },
-                    "gpioButtonPin": {
-                        "description": "Pin number on the RPI that the button is connected to",
+                    "gpioRequestPin": {
+                        "description": "Pin number on the RPI that the request button is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumeUpPin": {
+                        "description": "Pin number on the RPI that the volume up button is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumeDownPin": {
+                        "description": "Pin number on the RPI that the volume down button is connected to",
                         "type": "number",
                         "minimum": 0
                     }
@@ -270,7 +272,9 @@
                 "required": [
                     "motherDownloadedConfigFilename",
                     "fallbackSettings",
-                    "gpioButtonPin",
+                    "gpioRequestPin",
+                    "gpioVolumeUpPin",
+                    "gpioVolumeDownPin",
                     "loggingFileName"
                 ],
                 "additionalProperties": false

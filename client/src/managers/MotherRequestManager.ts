@@ -29,7 +29,6 @@ export interface MotherSettings {
     windThreshold_kph: number
     sayFuturePrediction: boolean
     connectivityIP: `${number}.${number}.${number}.${number}`
-    GPIOPollInterval_ms: number
     motherCheckInInterval_ms: number
     motherDownloadAlsoChecksIn: boolean
     githubUpdateCheckInterval_ms: number
@@ -58,14 +57,11 @@ export default class MotherRequestManager extends BaseManager {
                 if (fileData.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
                     this.Main.stageIntervalToRestart(IntervalIDs.Mother);
                 }
-                if (fileData.GPIOPollInterval_ms !== existingSettings.GPIOPollInterval_ms) {
-                    this.Main.stageIntervalToRestart(IntervalIDs.GPIO);
-                }
                 if (fileData.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
                     this.Main.stageIntervalToRestart(IntervalIDs.Github);
                 }
 
-                let purged;
+                let purged = false;
                 if (fileData.dialogueOptions && !isEqual(existingSettings.dialogueOptions, fileData.dialogueOptions)) {
                     this.Main.SpeechRequestHandler.FileManager.absolutePurge();
                     purged = true;
