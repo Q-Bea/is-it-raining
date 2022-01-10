@@ -76,6 +76,6 @@
     },
     "loggingFileName": "logs",
     "gpioRequestPin": 23,
-    "gpioVolumeDownPin": 27,
-    "gpioVolumeUpPin": 22
+    "gpioVolumeDownPin": 22,
+    "gpioVolumeUpPin": 27
 }

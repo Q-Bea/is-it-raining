@@ -28,10 +28,10 @@ export default class GPIOInterface extends BaseManager {
         const vUpButton = new Gpio(this.Main.config.gpioVolumeUpPin, "in", "rising", {debounceTimeout: 100});
 
         vUpButton.watch(() => {
-            console.log("Volume Up");
-
-            this.currentVolume = this.currentVolume + 10;
+            
+            this.currentVolume = this.currentVolume + 5;
             if (this.currentVolume > 100) this.currentVolume = 100;
+            console.log(`Volume Up --> At ${this.currentVolume}`);
 
             loudness.setVolume(this.currentVolume).catch(() => {/* */})
             return;
@@ -40,10 +40,10 @@ export default class GPIOInterface extends BaseManager {
         const vDownButton = new Gpio(this.Main.config.gpioVolumeDownPin, "in", "rising", {debounceTimeout: 100});
 
         vDownButton.watch(() => {
-            console.log("Volume Down");
-
-            this.currentVolume = this.currentVolume - 10;
+            
+            this.currentVolume = this.currentVolume - 5;
             if (this.currentVolume < 0) this.currentVolume = 0;
+            console.log(`Volume Down --> At ${this.currentVolume}`);
 
             loudness.setVolume(this.currentVolume).catch(() => {/* */})
             return;
