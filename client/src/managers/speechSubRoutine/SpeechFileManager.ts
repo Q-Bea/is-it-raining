@@ -85,15 +85,15 @@ export default class SpeechFileManager {
      */
     possiblePurge() {
         if (!this.RequestHandler.Main.SettingsManager.getSettings().savePreviousAudioFiles) {
-            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}`);
         }
     }
 
     absolutePurge(alsoDeleteInternal = false) {
-        fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+        fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}`);
 
         if (alsoDeleteInternal) {
-            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${INTERNAL_AUDIO_PATH_POST_CWD}`);
+            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}`);
         }
     }
 

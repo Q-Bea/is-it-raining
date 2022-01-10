@@ -20,7 +20,6 @@ export default class SettingsManager extends BaseManager {
         windThreshold_kph: 35,
         sayFuturePrediction: true,
         connectivityIP: "208.67.222.222",
-        GPIOPollInterval_ms: 500,
         motherCheckInInterval_ms: 15000,
         motherDownloadAlsoChecksIn: false,
         githubUpdateCheckInterval_ms: 1000*60*30,
