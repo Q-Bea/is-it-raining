@@ -89,8 +89,12 @@ export default class SpeechFileManager {
         }
     }
 
-    absolutePurge() {
+    absolutePurge(alsoDeleteInternal = false) {
         fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+
+        if (alsoDeleteInternal) {
+            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD + `${INTERNAL_AUDIO_PATH_POST_CWD}`);
+        }
     }
 
     deleteSpecificFile(fileName: ValidAudioFileName, audioFileType: AudioFileType) {

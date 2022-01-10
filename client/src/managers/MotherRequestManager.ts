@@ -33,7 +33,7 @@ export interface MotherSettings {
     motherCheckInInterval_ms: number
     motherDownloadAlsoChecksIn: boolean
     githubUpdateCheckInterval_ms: number
-
+    deleteAllDialogueOnBoot: boolean
 }
 
 export default class MotherRequestManager extends BaseManager {

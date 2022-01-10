@@ -23,8 +23,8 @@ export default class SettingsManager extends BaseManager {
         GPIOPollInterval_ms: 500,
         motherCheckInInterval_ms: 15000,
         motherDownloadAlsoChecksIn: false,
-        githubUpdateCheckInterval_ms: 1000*60*30
-    
+        githubUpdateCheckInterval_ms: 1000*60*30,
+        deleteAllDialogueOnBoot: true
     };
     constructor(Main: Main) {
         super(Main);

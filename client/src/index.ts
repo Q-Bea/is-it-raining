@@ -73,6 +73,10 @@ export default class Main {
         this.StorageManager.createInstance(this.config.motherDownloadedConfigFilename, false);
         this.StorageManager.createInstance(this.config.loggingFileName, false);
 
+        if (this.SettingsManager.getSettings().deleteAllDialogueOnBoot) {
+            this.SpeechRequestHandler.FileManager.absolutePurge(true);
+        }
+
         this.MotherRequestManager.checkInDownload();
         this.MotherRequestManager.startInterval();
         this.SpeechRequestHandler.setup();

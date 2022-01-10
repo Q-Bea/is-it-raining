@@ -78,6 +78,9 @@ export default class SpeechRequestHandler extends BaseManager {
                 stream.on("end", () => {
                     resolve(true);
                 });
+                stream.on("error", () => {
+                    resolve(false);
+                });
             } else {
                 resolve(false);
             }

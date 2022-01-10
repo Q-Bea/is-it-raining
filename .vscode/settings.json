@@ -149,10 +149,16 @@
                             "connectivityIP", 
                             "failOnNoFuture", 
                             "GPIOPollInterval_ms",
-                            "githubUpdateCheckInterval_ms"
+                            "githubUpdateCheckInterval_ms",
+                            "deleteAllDialogueOnBoot"
                         ],
                         "additionalProperties": false,
                         "properties": {
+                            "deleteAllDialogueOnBoot": {
+                                "description": "On boot, should the audio cache be purged?",
+                                "type": "boolean",
+                                "default": true
+                            },
                             "GPIOPollInterval_ms": {
                                 "description": "How many milliseconds between GPIO input polls?",
                                 "type": "number",
