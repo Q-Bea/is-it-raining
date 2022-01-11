@@ -114,19 +114,24 @@ export default class RuntimeManager extends BaseManager {
     private async failState(reason: RuntimeErrors) {
         this.Main.StorageManager.instances.get(this.Main.config.loggingFileName)?.writeJSON([`Runtime_${Date.now()}`, `Runtime Error: ${reason}`]);
         console.error(`Runtime Error! Code ${reason}`);
+        this.requestInProcess = false;
         if (reason === RuntimeErrors.NoInternet) {
-            const attemptNoWifi = await this.Main.SpeechRequestHandler.streamAudio(this.Main.noConnectionFileName, AudioFileType.INTERNAL); 
+            const attemptNoWifi = await this.Main.SpeechRequestHandler.streamAudio(this.Main.internalSoundFileNames.noInternet, AudioFileType.INTERNAL); 
             if (attemptNoWifi) {
                 return;
             }
         }
         
         if (reason === RuntimeErrors.NoPropertiesForCurrentWeather) {
-            const attemptUnknownWeather = await this.Main.SpeechRequestHandler.streamAudio(this.Main.unknownWeatherFileName, AudioFileType.INTERNAL); 
+            const attemptUnknownWeather = await this.Main.SpeechRequestHandler.streamAudio(this.Main.internalSoundFileNames.unknownWeatherFile, AudioFileType.INTERNAL); 
             if (attemptUnknownWeather) {
                 return;
             }
         }
-        await this.Main.SpeechRequestHandler.streamAudio(this.Main.randomErrorFileName, AudioFileType.INTERNAL); 
+        try {
+            await this.Main.SpeechRequestHandler.streamAudio(this.Main.internalSoundFileNames.randomError, AudioFileType.INTERNAL); 
+        } catch(e) {
+            //
+        }
     }
 }

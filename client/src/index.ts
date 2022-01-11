@@ -51,9 +51,12 @@ export default class Main {
     readonly GithubAutoUpdateManager: GithubAutoUpdateManager;
     readonly RuntimeManager: RuntimeManager;
 
-    readonly noConnectionFileName: ValidAudioFileName = "noConnection1.wav";
-    readonly randomErrorFileName: ValidAudioFileName = "randomError1.wav";
-    readonly unknownWeatherFileName: ValidAudioFileName = "unknownWeather.wav";
+    readonly internalSoundFileNames: Record<keyof MotherSettings["internalDialogue"], ValidAudioFileName> = {
+        noInternet: "noConnection1.wav",
+        randomError: "randomError1.wav",
+        unknownWeatherFile: "unknownWeather.wav"
+    };
+    
 
     private intervalToRestart: IntervalIDs[] = [];
 
@@ -76,7 +79,7 @@ export default class Main {
         this.StorageManager.createInstance(this.config.loggingFileName, false);
 
         if (this.SettingsManager.getSettings().deleteAllDialogueOnBoot) {
-            this.SpeechRequestHandler.FileManager.absolutePurge(true);
+            this.SpeechRequestHandler.FileManager.absolutePurge("both");
         }
 
         this.MotherRequestManager.checkInDownload();
@@ -93,18 +96,12 @@ export default class Main {
         // this.tmp()
     }
 
-    private async generateInternalAudio() {
+    async generateInternalAudio() {
         if (await this.checkInternetConnection()) {
-            this.SpeechRequestHandler.createOverrideAudio(this.noConnectionFileName, AudioFileType.INTERNAL, "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure it out yourself.");
-            this.SpeechRequestHandler.createOverrideAudio(this.randomErrorFileName, AudioFileType.INTERNAL, "Something went wrong, sorry. You should probably tell someone if this happens frequently.");   
-            this.SpeechRequestHandler.createOverrideAudio(this.unknownWeatherFileName, AudioFileType.INTERNAL, "Honestly, I don't know what's happening outside, good luck though!"); 
+            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.noInternet, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.noInternet);
+            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.randomError, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.randomError);   
+            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.unknownWeatherFile, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.unknownWeatherFile); 
         }
-    }
-
-    private tmp() {
-        setTimeout(() => {
-            this.RuntimeManager.makeRequest();
-        }, 2000);
     }
 
     /**

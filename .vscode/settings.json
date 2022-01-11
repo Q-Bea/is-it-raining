@@ -148,12 +148,34 @@
                             "sayFuturePrediction", 
                             "connectivityIP", 
                             "failOnNoFuture", 
-                            "GPIOPollInterval_ms",
                             "githubUpdateCheckInterval_ms",
-                            "deleteAllDialogueOnBoot"
+                            "deleteAllDialogueOnBoot",
+                            "internalDialogue"
                         ],
                         "additionalProperties": false,
                         "properties": {
+                            "internalDialogue": {
+                                "description": "Dialogue that should be used for errors",
+                                "required": ["noInternet", "randomError", "unknownWeatherFile"],
+                                "additionalProperties": false,
+                                "properties": {
+                                    "noInternet": {
+                                        "description": "Dialogue for file that plays with no wifi",
+                                        "type": "string",
+                                        "default": "noWifi.wav"
+                                    },
+                                    "randomError": {
+                                        "description": "Dialogue for file that plays when something wrong happens",
+                                        "type": "string",
+                                        "default": "randomError.wav"
+                                    },
+                                    "unknownWeatherFile": {
+                                        "description": "Dialogue for file that plays when no sound could be found",
+                                        "type": "string",
+                                        "default": "unknownSound.wav"
+                                    }
+                                }
+                            },
                             "deleteAllDialogueOnBoot": {
                                 "description": "On boot, should the audio cache be purged?",
                                 "type": "boolean",

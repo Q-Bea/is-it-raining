@@ -5,7 +5,7 @@ import {Gpio} from "onoff";
 import loudness from "loudness";
 
 export default class GPIOInterface extends BaseManager {
-    private currentVolume: number = 50;
+    private currentVolume = 50;
     constructor(Main: Main) {
         super(Main);
     }
@@ -33,7 +33,7 @@ export default class GPIOInterface extends BaseManager {
             if (this.currentVolume > 100) this.currentVolume = 100;
             console.log(`Volume Up --> At ${this.currentVolume}`);
 
-            loudness.setVolume(this.currentVolume).catch(() => {/* */})
+            loudness.setVolume(this.currentVolume).catch(() => {/* */});
             return;
         });
 
@@ -45,7 +45,7 @@ export default class GPIOInterface extends BaseManager {
             if (this.currentVolume < 0) this.currentVolume = 0;
             console.log(`Volume Down --> At ${this.currentVolume}`);
 
-            loudness.setVolume(this.currentVolume).catch(() => {/* */})
+            loudness.setVolume(this.currentVolume).catch(() => {/* */});
             return;
         });
     }

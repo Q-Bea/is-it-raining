@@ -21,7 +21,12 @@ export interface MotherSettings {
         rate: number,
         speaker: string,
         style: "assistant"|"chat"|"newscast"|"customerservice"
-    },
+    }
+    internalDialogue: {
+        noInternet: string
+        randomError: string
+        unknownWeatherFile: string
+    }
     failOnNoFuture: boolean
     savePreviousAudioFiles: boolean
     location: locationObject_latlng|locationObject_locationQuery
@@ -55,15 +60,19 @@ export default class MotherRequestManager extends BaseManager {
             const existingSettings = this.Main.SettingsManager.getSettings();
             if (fileData) {
                 if (fileData.motherCheckInInterval_ms !== existingSettings.motherCheckInInterval_ms) {
+                    console.log("New interval time for check Mother. Interval will restart!");
                     this.Main.stageIntervalToRestart(IntervalIDs.Mother);
                 }
                 if (fileData.githubUpdateCheckInterval_ms !== existingSettings.githubUpdateCheckInterval_ms) {
+                    console.log("New interval time for check Github. Interval will restart!");
                     this.Main.stageIntervalToRestart(IntervalIDs.Github);
                 }
 
                 let purged = false;
                 if (fileData.dialogueOptions && !isEqual(existingSettings.dialogueOptions, fileData.dialogueOptions)) {
-                    this.Main.SpeechRequestHandler.FileManager.absolutePurge();
+                    console.log("New dialogue options for all generated texting, running full purge!");
+
+                    this.Main.SpeechRequestHandler.FileManager.absolutePurge("both");
                     purged = true;
                 }
 
@@ -74,11 +83,30 @@ export default class MotherRequestManager extends BaseManager {
                         const existingObject = this.Main.SpeechRequestHandler.DialogueManager.getObjectByFilename(object.fileName);
                         if (existingObject) {
                             if (object.text !== existingObject.text) {
+                                console.log(`New dialogue for generated file ${existingObject.fileName}. Purging old...`);
+
                                 this.Main.SpeechRequestHandler.FileManager.deleteSpecificFile(object.fileName, AudioFileType.GENERATED);
                             }
                         }
                     }
                 }
+
+                //internal audio, similar to above
+                if (!purged) {
+                    if (fileData.internalDialogue) {
+                        for (const dialogue in fileData.internalDialogue) {
+                            const typecast = dialogue as keyof MotherSettings["internalDialogue"];
+                            if (fileData.internalDialogue[typecast] !== existingSettings.internalDialogue[typecast]) {
+                                console.log(`Regenerating internal ${typecast} dialogue file`);
+                                this.Main.SpeechRequestHandler.createOverrideAudio(this.Main.internalSoundFileNames[typecast], AudioFileType.INTERNAL, fileData.internalDialogue[typecast]);
+                            }
+                        }
+                    }
+                } else {
+                    console.log("Recreating internal audio post purge!");
+                    this.Main.generateInternalAudio();
+                }
+                
 
                 this.Main.StorageManager.LocalInterfaceManager.instances.get(this.Main.config.motherDownloadedConfigFilename)?.writeRawJSON(fileData);
 

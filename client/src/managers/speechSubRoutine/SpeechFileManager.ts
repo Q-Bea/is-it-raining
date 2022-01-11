@@ -89,10 +89,12 @@ export default class SpeechFileManager {
         }
     }
 
-    absolutePurge(alsoDeleteInternal = false) {
-        fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+    absolutePurge(purgeLocation: "generated"|"internal"|"both" = "generated") {
+        if (purgeLocation === "generated" || purgeLocation === "both") {
+            fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${GENERATED_AUDIO_PATH_POST_CWD}`);
+        }
 
-        if (alsoDeleteInternal) {
+        if (purgeLocation === "internal" || purgeLocation === "both") {
             fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}`);
         }
     }
