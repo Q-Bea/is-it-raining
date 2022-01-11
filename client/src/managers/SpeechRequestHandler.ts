@@ -9,7 +9,7 @@ export enum AudioFileType {
     GENERATED = 1
 }
 
-const BUFFER_END_TO_SPEAKER_FINISH_DELAY = 1300; //Guesstimate
+const BUFFER_END_TO_SPEAKER_FINISH_DELAY = 800; //Guesstimate
 
 export default class SpeechRequestHandler extends BaseManager {
     FileManager: SpeechFileManager;

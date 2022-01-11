@@ -5,3 +5,4 @@ auth.json
 **/generated/*
 **/audio/*
 motherConfig.json
+**/logs.json
