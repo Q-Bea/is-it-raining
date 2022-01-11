@@ -9,6 +9,8 @@ export enum AudioFileType {
     GENERATED = 1
 }
 
+const BUFFER_END_TO_SPEAKER_FINISH_DELAY = 1300; //Guesstimate
+
 export default class SpeechRequestHandler extends BaseManager {
     FileManager: SpeechFileManager;
     ServiceAPI: SpeechServicesAPI; 
@@ -76,7 +78,9 @@ export default class SpeechRequestHandler extends BaseManager {
                 stream.pipe(speaker);
     
                 stream.on("end", () => {
-                    resolve(true);
+                    setTimeout(() => {
+                        resolve(true);
+                    }, BUFFER_END_TO_SPEAKER_FINISH_DELAY);
                 });
                 stream.on("error", () => {
                     resolve(false);

@@ -29,7 +29,7 @@
             {
                 "fileName": "rainingWindyColdNow.wav",
                 "properties": ["Raining", "Windy", "Cold"],
-                "text": "Today you are in for a treat, it is raining, windy and cold. Have fun!"
+                "text": "Currently, it is raining, windy and cold. Have fun!"
             },
             {
                 "fileName": "futureRaining.wav",
@@ -44,7 +44,7 @@
             {
                 "fileName": "literalNothing.wav",
                 "properties": [],
-                "text": "It's not rainy or cold or anything! That means today will be a good day."
+                "text": "It is not raining, windy or cold."
             },
             {
                 "fileName": "futureNothing.wav",
