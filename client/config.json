@@ -15,59 +15,6 @@
             "randomError": "Something went wrong, sorry. You should probably tell someone if this happens frequently.",
             "unknownWeatherFile": "Honestly, I don't know what's happening outside, good luck though!"
         },
-        "dialogue": [
-            {
-                "fileName": "rainingNow.wav",
-                "properties": ["Raining"],
-                "text": "It is currently raining. Are you surprised?"
-            },
-            {
-                "fileName": "rainingWindyNow.wav",
-                "properties": ["Raining", "Windy"],
-                "text": "Right now it is raining and windy. You should consider if the umbrella is really worth it."
-            },
-            {
-                "fileName": "rainingWindyColdNow.wav",
-                "properties": ["Raining", "Windy", "Cold"],
-                "text": "Currently, it is raining, windy and cold. Have fun!"
-            },
-            {
-                "fileName": "futureRaining.wav",
-                "properties": ["Future", "Raining"],
-                "text": "In an hour it will be probably be raining, but not windy."
-            },
-            {
-                "fileName": "futureRainingWindy.wav",
-                "properties": ["Future", "Raining", "Windy"],
-                "text": "In an hour it will be probably be raining and windy."
-            },
-            {
-                "fileName": "literalNothing.wav",
-                "properties": [],
-                "text": "It is not raining, windy or cold."
-            },
-            {
-                "fileName": "futureNothing.wav",
-                "properties": ["Future"],
-                "text": "In an hour it will probably not be raining or windy."
-
-            },
-            {
-                "fileName": "something.wav",
-                "properties": ["*"],
-                "text": "There is currently weather outside. I don't know what type though."
-            },
-            {
-                "fileName": "cold.wav",
-                "properties": ["Cold"],
-                "text": "It is cold, but at least it isn't raining!"
-            },
-            {
-                "fileName": "recentCold.wav",
-                "properties": ["RecentlyAsked", "Cold"],
-                "text": "Just like last time you asked, it still isn't raining and it still is cold."
-            }
-        ],
         "dialogueOptions": {
             "pitch": 0,
             "rate": 15,

@@ -6,3 +6,4 @@ auth.json
 **/audio/*
 motherConfig.json
 **/logs.json
+localDialogue.json

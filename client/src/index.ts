@@ -15,6 +15,7 @@ import SettingsManager from "./managers/SettingsManager";
 import GithubAutoUpdateManager from "./managers/GithubAutoUpdater";
 import RuntimeManager from "./managers/Runtime";
 import { type ValidAudioFileName } from "./managers/speechSubRoutine/SpeechFileManager";
+import { DialogueObject } from "./managers/speechSubRoutine/SpeechDialogueManager";
 
 export interface ConfigData {
     motherDownloadedConfigFilename: string
@@ -151,6 +152,15 @@ export default class Main {
 
 const authData = require("../auth.json");
 const configData = require("../config.json");
+
+let internalDialogue: DialogueObject[];
+try {
+    internalDialogue = require("../localDialogue.json");
+} catch(e) {
+    internalDialogue = [];
+}
+
+(configData as ConfigData).fallbackSettings.dialogue = internalDialogue;
 
 if (
     !checkValidConfig(authData, ["isItRainingAuthToken", "motherAuthToken", "speechServicesAuthToken", "speechServicesAuthRegion"])||
