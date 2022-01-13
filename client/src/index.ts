@@ -82,8 +82,10 @@ export default class Main {
         if (this.SettingsManager.getSettings().deleteAllDialogueOnBoot) {
             this.checkInternetConnection().then((hasInternet) => {
                 if (hasInternet) {
+                    console.log("Purge on boot! Internet detected, deleting ALL files!");
                     this.SpeechRequestHandler.FileManager.absolutePurge("both");
                 } else {
+                    console.log("Purge on boot! No internet detected, deleting ONLY GENERATED files!");
                     this.SpeechRequestHandler.FileManager.absolutePurge("generated"); //So we keep the "no connection" error
                 }
             })
@@ -104,6 +106,7 @@ export default class Main {
     }
 
     async generateInternalAudio() {
+        console.log("Attempting to generate internal audio if internet connection!")
         if (await this.checkInternetConnection()) {
             this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.noInternet, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.noInternet);
             this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.randomError, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.randomError);   
