@@ -19,7 +19,10 @@ export default class SpeechServicesAPI {
     async downloadSpeechFile(text: string, fileNameWAV: ValidAudioFileName, audioFileType: AudioFileType, overrides?: VoiceSSMLSettings): Promise<boolean> {
         const isConnected = await this.RequestHandler.Main.checkInternetConnection();
 
-        if (!isConnected) return false;
+        if (!isConnected) {
+            console.log("Attempted to download speech but no internet!")
+            return false;
+        }
 
         const speechConfig = SpeechConfig.fromSubscription(this.RequestHandler.Main.auth.speechServicesAuthToken, this.RequestHandler.Main.auth.speechServicesAuthRegion);
         const audioConfig = AudioConfig.fromAudioFileOutput(this.RequestHandler.FileManager.getFilePathForSaving(fileNameWAV, audioFileType));

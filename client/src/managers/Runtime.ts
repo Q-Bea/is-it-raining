@@ -7,7 +7,7 @@ export enum RuntimeErrors {
     NoIITData = 1,
     NoPropertiesForCurrentWeather = 2,
     NoPropertiesForFutureWeather = 3,
-    FailedToGeneratedAudioForRequestedForcasts = 4
+    FailedToGenerateAudioForRequestedForecasts = 4
 }
 
 export default class RuntimeManager extends BaseManager {
@@ -96,7 +96,7 @@ export default class RuntimeManager extends BaseManager {
 
         for (let i = 0; i < results.length; i++) {
             if (results[i].status === "rejected") {
-                this.failState(RuntimeErrors.FailedToGeneratedAudioForRequestedForcasts);
+                this.failState(RuntimeErrors.FailedToGenerateAudioForRequestedForecasts);
                 return;
             } else {
                 this.Main.SpeechRequestHandler.enqueuePlayingAudio(audioObjectsToPlay[i]);
