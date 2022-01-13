@@ -44,7 +44,7 @@ export default class GithubAutoUpdateManager extends BaseManager {
             return true;
         }
 
-        if (toDateString.includes("ahead")) {
+        if (toDateString.includes("is ahead of")) {
             console.log("You are ahead of the remote branch! How? Fix it!");
             return true;
         }
