@@ -35,6 +35,7 @@ export default class SpeechServicesAPI {
                 result => {
                     synthesizer.close();
                     if (result) {
+                        console.log(`Successfully downloaded and saved audio for ${fileNameWAV}`)
                         resolve(true);
                     }//     // return result as stream                    }
                 },
