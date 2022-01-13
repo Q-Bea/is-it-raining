@@ -75,20 +75,19 @@ export default class Main {
         this.RuntimeManager = new RuntimeManager(this);
     }
 
-    start() {
+    async start() {
         this.StorageManager.createInstance(this.config.motherDownloadedConfigFilename, false);
         this.StorageManager.createInstance(this.config.loggingFileName, false);
 
         if (this.SettingsManager.getSettings().deleteAllDialogueOnBoot) {
-            this.checkInternetConnection().then((hasInternet) => {
-                if (hasInternet) {
-                    console.log("Purge on boot! Internet detected, deleting ALL files!");
-                    this.SpeechRequestHandler.FileManager.absolutePurge("both");
-                } else {
-                    console.log("Purge on boot! No internet detected, deleting ONLY GENERATED files!");
-                    this.SpeechRequestHandler.FileManager.absolutePurge("generated"); //So we keep the "no connection" error
-                }
-            })
+            const hasInternet = await this.checkInternetConnection()
+            if (hasInternet) {
+                console.log("Purge on boot! Internet detected, deleting ALL files!");
+                this.SpeechRequestHandler.FileManager.absolutePurge("both");
+            } else {
+                console.log("Purge on boot! No internet detected, deleting ONLY GENERATED files!");
+                this.SpeechRequestHandler.FileManager.absolutePurge("generated"); //So we keep the "no connection" error
+            }
         }
 
         this.MotherRequestManager.checkInDownload();
