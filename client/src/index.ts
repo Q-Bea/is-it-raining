@@ -80,7 +80,13 @@ export default class Main {
         this.StorageManager.createInstance(this.config.loggingFileName, false);
 
         if (this.SettingsManager.getSettings().deleteAllDialogueOnBoot) {
-            this.SpeechRequestHandler.FileManager.absolutePurge("both");
+            this.checkInternetConnection().then((hasInternet) => {
+                if (hasInternet) {
+                    this.SpeechRequestHandler.FileManager.absolutePurge("both");
+                } else {
+                    this.SpeechRequestHandler.FileManager.absolutePurge("generated"); //So we keep the "no connection" error
+                }
+            })
         }
 
         this.MotherRequestManager.checkInDownload();
