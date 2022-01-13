@@ -2,3 +2,8 @@ auth.json
 /**/node_modules/*
 /**/build/*
 **/db/*
+**/generated/*
+**/audio/*
+motherConfig.json
+**/logs.json
+localDialogue.json

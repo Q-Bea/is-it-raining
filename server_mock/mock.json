@@ -1,0 +1,11 @@
+{
+    "temperature_c_feel": 30,
+    "temperature_c_real": 30,
+    "isRaining": false,
+    "wind_kph": 10,
+    "fromCache": false,
+    "nextHour": {
+        "wind_kph": 30,
+        "isRaining": true
+    }
+}

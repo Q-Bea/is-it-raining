@@ -1,0 +1,34 @@
+{
+    "motherDownloadedConfigFilename": "motherConfig",
+    "fallbackSettings": {
+        "connectivityIP": "208.67.222.222",
+        "failOnNoFuture": false,
+        "location": {
+            "type": "latlng",
+            "value": [49.258500,-123.250640]
+        },
+        "coldFeelThreshold_c": 5,
+        "windThreshold_kph": 35,
+        "sayFuturePrediction": true,
+        "internalDialogue": {
+            "noInternet": "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure it out the weather yourself.",
+            "randomError": "Something went wrong, sorry. You should probably tell someone if this happens frequently.",
+            "unknownWeatherFile": "Honestly, I don't know what's happening outside, good luck though!"
+        },
+        "dialogueOptions": {
+            "pitch": 0,
+            "rate": 15,
+            "speaker": "en-US-JennyNeural",
+            "style": "assistant"
+        },
+        "savePreviousAudioFiles": true,
+        "motherCheckInInterval_ms": 30000,
+        "motherDownloadAlsoChecksIn": true,
+        "githubUpdateCheckInterval_ms": 1800000,
+        "deleteAllDialogueOnBoot": true
+    },
+    "loggingFileName": "logs",
+    "gpioRequestPin": 23,
+    "gpioVolumeDownPin": 27,
+    "gpioVolumeUpPin": 22
+}

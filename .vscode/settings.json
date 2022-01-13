@@ -96,13 +96,8 @@
             "fileMatch": [
                 "client/**/config.json"
             ],
-            "schema": {
+            "schema": {               
                 "properties": {
-                    "offlineBehaviour": {
-                        "description": "Behaviour if the client is unable to contact the IIT API (repeatLast or block).",
-                        "type": "string"
-                        
-                    },
                     "motherDownloadedConfigFilename": {
                         "description": "The name of the file containing stored properties from Mother",
                         "type": "string"
@@ -110,17 +105,67 @@
                     "fallbackSettings": {
                         "type": "object",
                         "description": "Fallback settings if Mother is unavilable",
-                        "required": ["savePreviousAudioFiles", "volume", "location"],
+                        "required": [
+                            "savePreviousAudioFiles", 
+                            "location", 
+                            "dialogueOptions", 
+                            "coldFeelThreshold_c", 
+                            "windThreshold_kph", 
+                            "sayFuturePrediction", 
+                            "connectivityIP", 
+                            "failOnNoFuture", 
+                            "githubUpdateCheckInterval_ms",
+                            "deleteAllDialogueOnBoot",
+                            "internalDialogue"
+                        ],
+                        "additionalProperties": false,
                         "properties": {
+                            "internalDialogue": {
+                                "description": "Dialogue that should be used for errors",
+                                "required": ["noInternet", "randomError", "unknownWeatherFile"],
+                                "additionalProperties": false,
+                                "properties": {
+                                    "noInternet": {
+                                        "description": "Dialogue for file that plays with no wifi",
+                                        "type": "string",
+                                        "default": "noWifi.wav"
+                                    },
+                                    "randomError": {
+                                        "description": "Dialogue for file that plays when something wrong happens",
+                                        "type": "string",
+                                        "default": "randomError.wav"
+                                    },
+                                    "unknownWeatherFile": {
+                                        "description": "Dialogue for file that plays when no sound could be found",
+                                        "type": "string",
+                                        "default": "unknownSound.wav"
+                                    }
+                                }
+                            },
+                            "deleteAllDialogueOnBoot": {
+                                "description": "On boot, should the audio cache be purged?",
+                                "type": "boolean",
+                                "default": true
+                            },
+                            "failOnNoFuture": {
+                                "description": "If future data is unavailable, should the request fail?",
+                                "type": "boolean",
+                                "default": false
+                            },
+                            "connectivityIP": {
+                                "description": "The IP to contact to check internet connectivity",
+                                "type": "string",
+                                "default": true
+                            },
+                            "sayFuturePrediction": {
+                                "description": "Whether or not the future prediction should be included in voice dialogue",
+                                "type": "boolean",
+                                "default": true
+                            },
                             "savePreviousAudioFiles": {
                                 "description": "Whether or not to save created audio files for reuse. If set to `false` after being true, existing audio files will be deleted",
-                                "type": "boolean"
-                            },
-                            "volume": {
-                                "description": "Volume of played audio files (0-10)",
-                                "type": "number",
-                                "minimum": 0,
-                                "maximum": 10
+                                "type": "boolean",
+                                "default": true
                             },
                             "location": {
                                 "type": "object",
@@ -130,25 +175,149 @@
                                         "description": "Either `city` or `latlng`"
                                     },
                                     "value": {
-                                        "type": "string",
-                                        "description": "Either the name of a searching city location string or lat,lng position"
+                                        "type": ["string", "array"],
+                                        "description": "Either the name of a searching city location string or lat,lng position (`city string` or [lat, long])"
                                     }
                                 }
+                            },
+                            "dialogueOptions": {
+                                "type": "object",
+                                "required": ["pitch", "rate", "style", "speaker"],
+                                "properties": {
+                                    "pitch": {
+                                        "minimum": -100,
+                                        "maximum": 100,
+                                        "description": "Pitch of the spoken speech when generated (in percent) relative to 0 (normal speed).",
+                                        "default": 0
+                                    },
+                                    "rate": {
+                                        "minimum": -100,
+                                        "maximum": 100,
+                                        "description": "Rate of the spoken speech when generated (in percent) relative to 0 (normal speed).",
+                                        "default": 0
+                                    },
+                                    "style": {
+                                        "description": "Style of the spoken speech when generated. Can be `assistant`, `chat`, `customerservice`, 'newscast`. Not all voices support all styles",
+                                        "default": "assistant",
+                                        "type": "string"
+                                    },
+                                    "speaker": {
+                                        "type": "string",
+                                        "description": "Voice of the speaker. See microsoft docs for available choices.",
+                                        "default": "en-US-JennyNeural"
+                                    }
+                                },
+                            },
+                            "coldFeelThreshold_c": {
+                                "type": "number",
+                                "description": "Cut off for when it is considered cold",
+                                "default": 0
+                            },
+                            "windThreshold_kph": {
+                                "type": "number",
+                                "description": "Cut off for when it is considered windy",
+                                "minimum": 0,
+                                "default": 35
+                            },
+                            "githubUpdateCheckInterval_ms": {
+                                "description": "How often github should be contacted to check for updates (milliseconds)",
+                                "type": "number",
+                                "minimum": 30000
+                            },
+                            "motherCheckInInterval_ms": {
+                                "description": "How long should the client wait between checkins and downloads from Mother (milliseconds)",
+                                "type": "number",
+                                "minimum": 15000,
+                            },
+                            "motherDownloadAlsoChecksIn": {
+                                "description": "If on the Mother server, downloading the config also counts as checking in",
+                                "type": "boolean"
                             }
                         }
+                    },
+                    "loggingFileName": {
+                        "description": "Filename of where to store logs to",
+                        "type": "string",
+                        "default": "logs.json"
+                    },
+                    "gpioRequestPin": {
+                        "description": "Pin number on the RPI that the request button is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumeUpPin": {
+                        "description": "Pin number on the RPI that the volume up button is connected to",
+                        "type": "number",
+                        "minimum": 0
+                    },
+                    "gpioVolumeDownPin": {
+                        "description": "Pin number on the RPI that the volume down button is connected to",
+                        "type": "number",
+                        "minimum": 0
                     }
                 },
                 "required": [
-                    "offlineBehaviour",
                     "motherDownloadedConfigFilename",
-                    "fallbackSettings"
+                    "fallbackSettings",
+                    "gpioRequestPin",
+                    "gpioVolumeUpPin",
+                    "gpioVolumeDownPin",
+                    "loggingFileName"
                 ],
                 "additionalProperties": false
             }
+        },
+        {
+            "fileMatch": [
+                "localDialogue.json"
+            ],
+            "schema": {
+                "definitions": {
+                    "dialogueLine": {
+                        "type": "object",
+                        "properties": {
+                            "text": {
+                                "description": "The words that should be spoken when this dialogue is selected",
+                                "type": "string",
+                                "default": "string"
+                            },
+                            "properties": {
+                                "type": "array",
+                                "description": "A keyword based array of descriptors about the conditions of activating this line",
+                                "items": {
+                                    "type": "string",
+                                    "enum": ["Future","Cold","Raining","*","RecentlyAsked","Windy"]
+                                },
+                                "uniqueItems": true,
+                                "additionalItems": false
+                            },
+                            "fileName": {
+                                "type": "string",
+                                "default": "name_of_file.wav",
+                                "description": "The name of the file that should be used when this line is generated by speech synth"
+                            }
+                        },
+                        "required": [
+                            "text",
+                            "properties",
+                            "fileName"
+                        ]
+                    }
+                },
+                "type": "array",
+                "description": "array of dialoge objects, this can be configured by Mother",
+                "uniqueItems": true,
+                "items": { "$ref": "#/definitions/dialogueLine"},
+                "default": [""],
+                "additionalItems": false
+            },
         }
     ],
     "cSpell.words": [
         "Behaviour",
-        "latlng"
+        "cognitiveservices",
+        "customerservice",
+        "latlng",
+        "linebreak"
     ]
 }
