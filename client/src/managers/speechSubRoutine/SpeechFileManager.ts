@@ -97,6 +97,9 @@ export default class SpeechFileManager {
         if (purgeLocation === "internal" || purgeLocation === "both") {
             fsExtra.emptyDirSync(this.RequestHandler.Main.ensureCorrectCWD() + `${INTERNAL_AUDIO_PATH_POST_CWD}`);
         }
+
+        //I'm too lazy to do this correctly
+        this.setupDirectories();
     }
 
     deleteSpecificFile(fileName: ValidAudioFileName, audioFileType: AudioFileType) {
