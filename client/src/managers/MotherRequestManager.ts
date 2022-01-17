@@ -26,6 +26,7 @@ export interface MotherSettings {
         noInternet: string
         randomError: string
         unknownWeatherFile: string
+        reset: string
     }
     failOnNoFuture: boolean
     savePreviousAudioFiles: boolean

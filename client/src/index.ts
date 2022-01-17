@@ -55,7 +55,8 @@ export default class Main {
     readonly internalSoundFileNames: Record<keyof MotherSettings["internalDialogue"], ValidAudioFileName> = {
         noInternet: "noConnection1.wav",
         randomError: "randomError1.wav",
-        unknownWeatherFile: "unknownWeather.wav"
+        unknownWeatherFile: "unknownWeather.wav",
+        reset: "reset.wav"
     };
     
 
@@ -107,9 +108,12 @@ export default class Main {
     async generateInternalAudio() {
         console.log("Attempting to generate internal audio if internet connection!")
         if (await this.checkInternetConnection()) {
-            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.noInternet, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.noInternet);
-            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.randomError, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.randomError);   
-            this.SpeechRequestHandler.createOverrideAudio(this.internalSoundFileNames.unknownWeatherFile, AudioFileType.INTERNAL, this.SettingsManager.getSettings().internalDialogue.unknownWeatherFile); 
+            for (const internalSound in this.internalSoundFileNames) {
+                this.SpeechRequestHandler.createOverrideAudio(
+                    this.internalSoundFileNames[internalSound as keyof MotherSettings["internalDialogue"]], 
+                    AudioFileType.INTERNAL, 
+                    this.SettingsManager.getSettings().internalDialogue[internalSound as keyof MotherSettings["internalDialogue"]]);
+            }
         }
     }
 
