@@ -15,7 +15,7 @@ export default class SettingsManager extends BaseManager {
             "style": "assistant"
         },
         internalDialogue: {
-            "noInternet": "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure it out the weather yourself.",
+            "noInternet": "Sorry, I can't connect to the internet right now. If you leave me outside for a bit you can probably figure out the weather yourself.",
             "randomError": "Something went wrong, sorry. You should probably tell someone if this happens frequently.",
             "unknownWeatherFile": "Honestly, I don't know what's happening outside, good luck though!",
             "reset": "Resetting!"
