@@ -1,7 +1,7 @@
 import Main from ".";
 import BaseManager from "./BaseManager";
 import express from "express";
-import { InvalidWeatherDataReturnedError, NoWeatherDataReturnedError } from "./WeatherManager";
+import { InvalidWeatherDataReturnedError, NoWeatherDataReturnedError, WeatherData } from "./WeatherManager";
 
 export default class ExpressManager extends BaseManager {
     express
@@ -11,7 +11,7 @@ export default class ExpressManager extends BaseManager {
         this.express = express();
     }
 
-    logRequest(clientID: string) {
+    logRequest(clientID: string, data?: WeatherData) {
         const existingData = this.Main.DbManager.get(clientID);
 
         let total = 0
@@ -25,7 +25,13 @@ export default class ExpressManager extends BaseManager {
         }
 
         const totalRequests = this.getTotalRequests()
-        console.log(`Request Received! -->\n  Client ID: ${clientID}\n  Total requests by this client: ${total}\n  Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}%)\n------------\n`)
+        if (!data) {
+            console.log(`Request Received! -->\n  Client ID: ${clientID}\n  Total requests by this client: ${total}\n  Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}%)\n------------\n`)
+        } else {
+            console.log(`  Request Received! -->\n  Client ID: ${clientID}\n  Total requests by this client: ${total}\n  Total of all requests to date: ${totalRequests} (~${Math.round((total/totalRequests)*100)}%)\nData Returned:`)
+            console.dir(data);
+            console.log("------------\n")
+        }
     }
 
     private getTotalRequests() {
@@ -76,12 +82,12 @@ export default class ExpressManager extends BaseManager {
             return;
         }
 
-        this.logRequest(req.params.clientID);
-
+        
         if (typeof(req.params.location) === "string") {
             try {
                 const latLng = await this.Main.WeatherManager.getLatLongFromLocationQuery(req.params.location);
                 const weatherData = await this.Main.WeatherManager.getWeatherData(latLng[0], latLng[1])
+                this.logRequest(req.params.clientID, weatherData);
                 res.send(weatherData);
             } catch(e) {
                 if (e instanceof NoWeatherDataReturnedError || e instanceof InvalidWeatherDataReturnedError) {
@@ -92,6 +98,8 @@ export default class ExpressManager extends BaseManager {
             }
 
             return;
+        } else {
+            this.logRequest(req.params.clientID);
         }
         res.sendStatus(400);
     }
@@ -103,14 +111,14 @@ export default class ExpressManager extends BaseManager {
             return; 
         }
 
-        this.logRequest(req.params.clientID);
-
+        
         if (typeof(req.params.lat) === "string" && typeof(req.params.lng) === "string") {
             try {
                 if (isNaN(parseInt(req.params.lat)) || isNaN(parseInt(req.params.lng))) {
                     throw Error();
                 }
                 const weatherData = await this.Main.WeatherManager.getWeatherData(req.params.lat, req.params.lng);
+                this.logRequest(req.params.clientID, weatherData);
                 res.send(weatherData);
             } catch(e) {
                 if (e instanceof NoWeatherDataReturnedError || e instanceof InvalidWeatherDataReturnedError) {
@@ -121,6 +129,8 @@ export default class ExpressManager extends BaseManager {
             }
 
             return;
+        } else {
+            this.logRequest(req.params.clientID);
         }
 
         res.sendStatus(400);
