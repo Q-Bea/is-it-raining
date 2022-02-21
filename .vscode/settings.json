@@ -128,17 +128,22 @@
                                     "noInternet": {
                                         "description": "Dialogue for file that plays with no wifi",
                                         "type": "string",
-                                        "default": "noWifi.wav"
+                                        "default": "dialogue goes here."
                                     },
                                     "randomError": {
                                         "description": "Dialogue for file that plays when something wrong happens",
                                         "type": "string",
-                                        "default": "randomError.wav"
+                                        "default": "dialogue goes here."
                                     },
                                     "unknownWeatherFile": {
                                         "description": "Dialogue for file that plays when no sound could be found",
                                         "type": "string",
-                                        "default": "unknownSound.wav"
+                                        "default": "dialogue goes here."
+                                    },
+                                    "reset": {
+                                        "description": "Dialogue for file that plays when the device is being manually reset",
+                                        "type": "string",
+                                        "default": "dialogue goes here."
                                     }
                                 }
                             },
