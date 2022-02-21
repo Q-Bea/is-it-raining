@@ -7,6 +7,7 @@ export interface AuthData {
     openWeatherAPIKey: string
     mapQuestAPIKey: string
     validClientIDs: string[]
+    pirateWeatherAPIKey: string
 }
 
 export interface ConfigData {
@@ -14,6 +15,7 @@ export interface ConfigData {
     useWeatherCaching: boolean //If enabled, API requests are only made to pirate weather if it has been more than x minutes since the last request
     cacheMaxLifespanMinutes: number
     maxCachedItems?: number
+    pirateWeatherPrecipProbabilityThreshold: number
 }
 
 export default class Main {
@@ -73,8 +75,8 @@ const config = require("../config.json");
 
 //Check to ensure configs are valid
 if (
-    !checkValidConfig(auth, ["openWeatherAPIKey", "mapQuestAPIKey", "validClientIDs"]) || 
-    !checkValidConfig(config, ["cacheMaxLifespanMinutes", "port", "useWeatherCaching"])
+    !checkValidConfig(auth, ["pirateWeatherAPIKey","openWeatherAPIKey", "mapQuestAPIKey", "validClientIDs"]) || 
+    !checkValidConfig(config, ["cacheMaxLifespanMinutes", "port", "useWeatherCaching", "pirateWeatherPrecipProbabilityThreshold"])
 ) {
     console.error("INVALID CONFIG FILES! EXITING...")
     process.exit(1);
