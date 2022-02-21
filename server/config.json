@@ -2,5 +2,6 @@
     "cacheMaxLifespanMinutes": 15,
     "port": 7070,
     "useWeatherCaching": true,
-    "maxCachedItems": 5
+    "maxCachedItems": 5,
+    "pirateWeatherPrecipProbabilityThreshold": 0.9
 }

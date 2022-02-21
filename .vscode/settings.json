@@ -12,6 +12,10 @@
                         "description": "API Key for Map Quest",
                         "type": "string"
                     },
+                    "pirateWeatherAPIKey": {
+                        "description": "API Key for Pirate Weather",
+                        "type": "string"
+                    },
                     "validClientIDs": {
                         "description": "An array of tokens that can be used to trigger api flows",
                         "type": ["array"]
@@ -20,6 +24,7 @@
                 "required": [
                     "openWeatherAPIKey",
                     "mapQuestAPIKey",
+                    "pirateWeatherAPIKey",
                     "validClientIDs"
                 ],
                 "additionalProperties": false
@@ -50,12 +55,19 @@
                         "type": "number",
                         "description": "Limit on how many items can be in the cache, if the limit is met, items that should be cached just aren't",
                         "minimum": 0
+                    },
+                    "pirateWeatherPrecipProbabilityThreshold": {
+                        "type": "number",
+                        "description": "Percentage probability that it will rain, if greater than this value, server will say it is raining",
+                        "minimum": 0,
+                        "maximum": 1
                     }
                 },
                 "required": [
                     "useWeatherCaching",
                     "cacheMaxLifespanMinutes",
-                    "port"
+                    "port",
+                    "pirateWeatherPrecipProbabilityThreshold"
                 ],
                 "additionalProperties": false
             }
@@ -323,6 +335,7 @@
         "cognitiveservices",
         "customerservice",
         "latlng",
-        "linebreak"
+        "linebreak",
+        "Precip"
     ]
 }
