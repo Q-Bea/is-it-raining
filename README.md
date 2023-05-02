@@ -1,13 +1,28 @@
-Made as a christmas gift for Claire.
+# Is it raining?
+Is it raining? Is it windy? Is it cold? 
 
+Living in Vancouver, these are the only three things you need to know when leaving your house in the morning. Three simple yes or no questions, so why fuss over complicated weather apps with useless overly-complicated graphs and 7-day forcasts?
+
+At the click of a button, the Is It Raining machine will answer these questions and only these questions. What more could you ask for?
+
+## Description
+This was a project I made as a gift for a friend who always wished for a simpler weather app. It is designed to run on a Raspberry Pi connected to a wired speaker. Weather data is retrieved from the Is It Raining server API and weather information is spoken to the user via the Microsoft Speech Synthesis API. Device Configuration can be managed off-device using my private heartbeat uptime monitor, "Mother", which also doubles as a configuration hoster which devices can pull from. Instructions for how to get a raining machine built or running will not be provided as of how gimmicky the device is.
+
+## Behind the scenes
+All the code for this project runs in node.js, written in Typescript. The client is designed to run on a Raspberry Pi on Linux. The client listens for a button press on a specified GPIO pin. When pressed, the client queries the Is It Raining Server which queries multiple open-source weather API's and then returns the most accurate information as described below. As we are in Vancouver, slight bias is applied towards assuming it is raining (or in other words, the requirements to be considered "not raining" are far more stringent than the requirements to be considered "raining").
+
+Once Weather data is returned, the client queries the Microsoft Speech Synthesis API and generates a sound file compiling the important results, then the sound file will be played over a connected sound device.
+
+## Payload and Configuration
 This file contains the source files for two projects:
-## 1: An express webserver
+
+### 1: An express webserver
 GET requests to the server respond with answers to the only three questions that need to be answered
 - Is it cold? 
 - Is it raining?
 - Is it windy?
 
-### Server API Requests
+#### Server API Requests
 The server only accepts GET Requests. The following endpoints are supported:
 
 `{hostname}/<clientID>/location/<query>`
@@ -33,17 +48,17 @@ Valid API requests respond with the following payload:
 }
 ```
 
-## 2: The "Is It Raining" Machine
+### 2: The "Is It Raining" Machine
 An arduino powered box that when prompted, says whether it is cold, raining and or if it is windy.
 
 The cold threshold is configurable by the end user
 
 The dialogue and many operations of the client are fully configurable by Mother.
 
-### Configuration 
+#### Configuration 
 Configuration for the client contains a 3 level fallback system. Layer 1 is Mother, periodically, the client will query Mother for updated configurations. If a configuration or specific setting is not found, the parameter is pulled from the local `config.json` file. If it turns out this file is also corrupted or unavailable, data is instead pulled from the hardcoded property in `SettingsManager.ts`.
 
-#### Mother Playload
+##### Mother Playload
 ```js
 {
     "connectivityIP": number, //The IP the client uses to check if it has an internet connection
@@ -79,7 +94,7 @@ Configuration for the client contains a 3 level fallback system. Layer 1 is Moth
 }
 ```
 
-#### Sample Payload
+##### Sample Payload
 ```js
 {
     "connectivityIP": "208.67.222.222",
